@@ -1,0 +1,1 @@
+{ "invoiceList": { "title": "Invoices", "add": "Add invoice" }, "clientList": { "title": "Clients", "add": "Add client" }, "invoiceForm": { "create": "Create invoice", "draft": "Save as draft" } }

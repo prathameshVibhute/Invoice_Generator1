@@ -1,0 +1,82 @@
+erDiagram
+    USER ||--o{ ORG_MEMBER : "belongs to orgs via"
+    ORGANIZATION ||--o{ ORG_MEMBER : "has members"
+    ORGANIZATION ||--o{ CLIENT : "has"
+    ORGANIZATION ||--o{ INVOICE : "issues"
+    CLIENT ||--o{ INVOICE : "is billed on"
+    INVOICE ||--o{ INVOICE_ITEM : "contains"
+
+    USER {
+        uuid id PK
+        string name
+        string email UK
+        string password_hash "nullable if Google-only"
+        string google_id "nullable if password-only"
+        datetime created_at
+    }
+
+    ORG_MEMBER {
+        uuid id PK
+        uuid user_id FK
+        uuid org_id FK
+        string role "owner, member (TBD)"
+        datetime created_at
+    }
+
+    ORGANIZATION {
+        uuid id PK
+        string name
+        string address
+        string state
+        string country
+        string gst_no "nullable"
+        string logo_url
+        string signature_url
+        string contact_details
+        string invoice_number_prefix
+        int invoice_number_current_seq
+        json bank_details "parked, unused in v1 flow"
+        datetime created_at
+    }
+
+    CLIENT {
+        uuid id PK
+        uuid org_id FK
+        string name
+        string gst_no "nullable, format-validated"
+        string address
+        string state
+        string country
+        string contact_details
+        string email
+        boolean is_deleted "soft delete"
+        datetime created_at
+    }
+
+    INVOICE {
+        uuid id PK
+        uuid org_id FK
+        uuid client_id FK
+        string invoice_number "unique per org; fixed on edit, incremented on new/copy"
+        enum status "draft, active, partially_paid, paid"
+        boolean is_gst_invoice
+        enum gst_split_type "none, cgst_sgst, igst"
+        decimal amount_paid "OPEN ITEM: needed to support partially_paid status"
+        decimal subtotal
+        decimal total
+        string signature_url
+        boolean is_deleted "soft delete; paid invoices cannot be deleted at all"
+        datetime created_at
+        datetime updated_at
+    }
+
+    INVOICE_ITEM {
+        uuid id PK
+        uuid invoice_id FK
+        string item_name
+        string hsn_sac_code
+        decimal quantity
+        decimal gst_percentage "nullable if not applicable"
+        decimal rate
+        decimal total "auto-calculated: quantity * rate (+ gst)"
+    }

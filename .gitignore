@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnpm-store/
+
+# Next.js build output
+.next/
+**/.next/
+out/
+.turbo/
+.vercel/
+
+# Build artifacts
+dist/
+**/dist/
+coverage/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+*.log
+pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Firebase local tooling
+.firebase/
+firebase-debug.log
+
+# Firebase emulators and local service credentials
+firebase-export/
+*.firebase.json
+service-account*.json

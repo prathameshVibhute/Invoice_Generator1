@@ -1,0 +1,11 @@
+{
+  "name": "invoice-generator",
+  "private": true,
+  "packageManager": "pnpm@12.4.1",
+  "scripts": {
+    "dev": "pnpm --filter @invoice-generator/web dev",
+    "build": "pnpm --filter @invoice-generator/web build",
+    "typecheck": "pnpm --filter @invoice-generator/web typecheck"
+  },
+  "devDependencies": { "typescript": "^5.7.3", "@types/node": "^22.10.2", "@types/react": "^19.0.2", "@types/react-dom": "^19.0.2" }
+}
