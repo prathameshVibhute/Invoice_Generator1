@@ -1,1 +1,5 @@
-import { InvoiceFormScreen } from "@invoice-generator/modules"; export default async function Page({params}:{params:Promise<{invoiceId:string}>}){const {invoiceId}=await params;return <InvoiceFormScreen id={invoiceId}/>;}
+import { InvoiceFormScreen } from "@invoice-generator/modules";
+export default async function Page({ params }: { params: Promise<{ invoiceId: string }> }) {
+  const { invoiceId } = await params;
+  return <InvoiceFormScreen id={invoiceId} />;
+}

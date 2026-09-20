@@ -12,15 +12,15 @@ Refer to `invoice-generator-spec.md` (product spec) and `invoice-generator-er-di
 
 ## 1. Tech Stack
 
-| Layer | Choice |
-|---|---|
-| Frontend framework | React + Next.js (App Router) |
-| Styling | Tailwind CSS |
-| Icons | Tabler Icons (`@tabler/icons-react`) |
-| Backend | Firebase (Auth, Firestore, Storage, Cloud Functions where needed) |
-| Language | TypeScript, strict mode, no implicit `any` anywhere |
-| i18n | JSON-based translation files, loaded at runtime |
-| App type | PWA — installable, with manifest + service worker (no offline data sync in v1) |
+| Layer              | Choice                                                                         |
+| ------------------ | ------------------------------------------------------------------------------ |
+| Frontend framework | React + Next.js (App Router)                                                   |
+| Styling            | Tailwind CSS                                                                   |
+| Icons              | Tabler Icons (`@tabler/icons-react`)                                           |
+| Backend            | Firebase (Auth, Firestore, Storage, Cloud Functions where needed)              |
+| Language           | TypeScript, strict mode, no implicit `any` anywhere                            |
+| i18n               | JSON-based translation files, loaded at runtime                                |
+| App type           | PWA — installable, with manifest + service worker (no offline data sync in v1) |
 
 ---
 
@@ -113,6 +113,7 @@ invoice-generator/
 ```
 
 **Rules to enforce:**
+
 - `apps/web/app/**/page.tsx` files should only compose a `Screen` component from the matching
   `packages/modules/<name>/screen` folder, plus route-level concerns (metadata, layout). No
   business logic, no direct Firestore calls, inside route files.
@@ -133,6 +134,7 @@ shared tooling config. Individual packages under `apps/*` and `packages/*` must 
 they declare what they need, they do not redeclare how the whole repo is built.
 
 **Hard rules:**
+
 - There is exactly **one** `node_modules` folder that matters — the one pnpm manages at the repo
   root (pnpm itself creates small internal `node_modules/.pnpm` symlink structures per package,
   which is normal and not something to "fix" — what must **never** happen is a package having its
@@ -177,6 +179,7 @@ they declare what they need, they do not redeclare how the whole repo is built.
   right.
 
 **Before generating code, confirm this structure:**
+
 ```
 invoice-generator/
 ├── node_modules/            # the ONLY real node_modules in the repo
@@ -208,6 +211,7 @@ invoice-generator/
         ├── package.json
         └── tsconfig.json
 ```
+
 If, while generating the project, a package under `packages/` seems to need its own build/dev
 config beyond a minimal `package.json` + `tsconfig.json`, stop and ask — that almost always
 signals the folder boundary is wrong rather than a genuine need for another config file.
@@ -327,14 +331,14 @@ Components then use `bg-primary`, `text-statusPaid`, `text-lg`, etc. — never i
 Firestore is a NoSQL document store, so the relational ER diagram needs to be translated into
 collections. Suggested mapping:
 
-| Entity | Firestore structure |
-|---|---|
-| `users` | Top-level collection, doc ID = Firebase Auth UID |
-| `orgMembers` | Top-level collection, fields: `userId`, `orgId`, `role` (enables querying "all orgs for a user" and "all members of an org") |
-| `organizations` | Top-level collection |
-| `clients` | Top-level collection, field `orgId` for scoping + composite index on `(orgId, isDeleted)` |
-| `invoices` | Top-level collection, field `orgId` + `clientId`, composite indexes for `(orgId, status)`, `(orgId, createdAt)`, `(clientId, status)` |
-| `invoiceItems` | Embedded array field **within** the invoice document (not a subcollection) — items are always read/written together with their parent invoice, so embedding avoids extra reads |
+| Entity          | Firestore structure                                                                                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `users`         | Top-level collection, doc ID = Firebase Auth UID                                                                                                                               |
+| `orgMembers`    | Top-level collection, fields: `userId`, `orgId`, `role` (enables querying "all orgs for a user" and "all members of an org")                                                   |
+| `organizations` | Top-level collection                                                                                                                                                           |
+| `clients`       | Top-level collection, field `orgId` for scoping + composite index on `(orgId, isDeleted)`                                                                                      |
+| `invoices`      | Top-level collection, field `orgId` + `clientId`, composite indexes for `(orgId, status)`, `(orgId, createdAt)`, `(clientId, status)`                                          |
+| `invoiceItems`  | Embedded array field **within** the invoice document (not a subcollection) — items are always read/written together with their parent invoice, so embedding avoids extra reads |
 
 **Invoice numbering:** since Firestore doesn't have auto-increment, maintain
 `invoiceNumberCurrentSeq` on the `organizations` document and increment it inside a **Firestore
@@ -361,6 +365,7 @@ default — never a real document delete for clients/invoices in a non-Draft sta
 ## 9. Out of Scope for Initial Build
 
 (Kept here for traceability — see product spec's "Later Discussion" section for details.)
+
 - Offline data sync
 - Push notifications
 - Forgot password / email verification / Google+password account linking

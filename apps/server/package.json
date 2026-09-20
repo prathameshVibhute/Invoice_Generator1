@@ -1,1 +1,7 @@
-{ "name":"@invoice-generator/server", "version":"0.0.0", "private":true, "main":"./http.ts", "types":"./http.ts" }
+{
+  "name": "@invoice-generator/server",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./http.ts",
+  "types": "./http.ts"
+}

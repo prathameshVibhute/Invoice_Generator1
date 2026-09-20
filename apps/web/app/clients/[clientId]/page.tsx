@@ -1,1 +1,5 @@
-import { ClientDetailsScreen } from "@invoice-generator/modules"; export default async function Page({params}:{params:Promise<{clientId:string}>}){const {clientId}=await params;return <ClientDetailsScreen id={clientId}/>;}
+import { ClientDetailsScreen } from "@invoice-generator/modules";
+export default async function Page({ params }: { params: Promise<{ clientId: string }> }) {
+  const { clientId } = await params;
+  return <ClientDetailsScreen id={clientId} />;
+}

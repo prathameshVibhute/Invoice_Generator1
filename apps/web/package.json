@@ -1,6 +1,23 @@
 {
-  "name": "@invoice-generator/web", "private": true, "version": "0.0.0",
-  "scripts": { "dev": "next dev", "build": "next build", "typecheck": "tsc --noEmit" },
-  "dependencies": { "@invoice-generator/modules": "workspace:*", "@invoice-generator/types": "workspace:*", "@invoice-generator/ui": "workspace:*", "@tabler/icons-react": "^3.31.0", "next": "^15.1.3", "react": "^19.0.0", "react-dom": "^19.0.0" },
-  "devDependencies": { "@tailwindcss/postcss": "^4.0.0", "tailwindcss": "^4.0.0" }
+  "name": "@invoice-generator/web",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@invoice-generator/modules": "workspace:*",
+    "@invoice-generator/types": "workspace:*",
+    "@invoice-generator/ui": "workspace:*",
+    "@tabler/icons-react": "^3.31.0",
+    "next": "^15.1.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "tailwindcss": "^4.0.0"
+  }
 }

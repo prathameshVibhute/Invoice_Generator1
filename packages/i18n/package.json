@@ -1,1 +1,7 @@
-{ "name":"@invoice-generator/i18n", "version":"0.0.0", "private":true, "main":"./index.ts", "types":"./index.ts" }
+{
+  "name": "@invoice-generator/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts"
+}

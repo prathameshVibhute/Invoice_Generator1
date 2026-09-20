@@ -3,6 +3,7 @@
 A Progressive Web Application for creating and managing invoices, clients, and organizations.
 
 **PWA install behavior (in scope for v1):**
+
 - App is installable to the home screen / app drawer via a `manifest.json` (name, icons, theme colors) and a basic service worker (no offline data sync required — just enough to satisfy installability).
 - On Android/Chrome, the browser's native "Add to Home Screen" prompt is used, optionally backed by a custom in-app "Install App" button (via the `beforeinstallprompt` event).
 - On iOS/Safari, no automatic prompt is available — include a short in-app hint directing users to Share → "Add to Home Screen."
@@ -27,6 +28,7 @@ A Progressive Web Application for creating and managing invoices, clients, and o
 ### 1a. Invoice List Page
 
 **Layout**
+
 - Page title "Invoices" with an **Add Invoice** button.
 - A custom calendar component — defaults to the current month's data.
 - Below the calendar, 3 summary cards:
@@ -45,6 +47,7 @@ A Progressive Web Application for creating and managing invoices, clients, and o
 - Empty state screen when no data is available.
 
 **Behavior / Flow**
+
 - Switching tabs (All/Paid/Unpaid) **does not** change the calendar's selected month/date range — it only resets pagination to page 1 and re-filters the existing date range by status.
 - No search bar on this page — finding a specific invoice by number isn't a realistic user flow. To find a client's invoices, the user navigates to that Client's Details page instead.
 - No sorting for v1 (default order — likely newest first).
@@ -55,6 +58,7 @@ A Progressive Web Application for creating and managing invoices, clients, and o
 ### 1b. Invoice Details Page
 
 **Layout**
+
 - Page title "Invoice Details", **Download** button, and a dropdown with: Mark as Paid, Delete, Copy, Edit.
 - Invoice details card:
   - Invoice number
@@ -74,6 +78,7 @@ A Progressive Web Application for creating and managing invoices, clients, and o
 - Invoice total
 
 **Behavior / Flow**
+
 - No due date, no payment-details section, no notes field, no audit trail — out of scope for v1.
 - **Delete** is disabled/hidden for invoices in Paid or Partially Paid status (see state machine below).
 - **Edit** is disabled for invoices that are soft-deleted and in Draft status (see below) — user can only Copy such an invoice.
@@ -83,6 +88,7 @@ A Progressive Web Application for creating and managing invoices, clients, and o
 ### 1c. Invoice Form (Create / Copy / Edit)
 
 **Layout**
+
 - Title: "New Invoice" (for Add New and Copy), or "Edit Invoice" (for Edit).
 - Invoice number field (editable).
 - Client search dropdown:
@@ -107,16 +113,19 @@ A Progressive Web Application for creating and managing invoices, clients, and o
 - No discount field (neither per-item nor invoice-level) in v1.
 
 **Invoice numbering**
+
 - On **Add New** or **Copy**, the invoice number auto-increments from the organization's current series.
 - On **Edit**, the invoice number is fixed and does **not** re-increment, regardless of other changes made.
 
 **GST Logic**
+
 - Requires a `state` and `country` field on both Organization and Client.
 - If Client's state == Organization's state → split GST into CGST + SGST.
 - If Client's state ≠ Organization's state (same country) → apply IGST.
 - Cross-country invoicing is not handled in v1 (flagged for later — would need export-invoice rules).
 
 **Invoice Status State Machine**
+
 - **Draft** → editable, can be hard-deleted, can be moved to Active.
 - **Active (Unpaid)** → editable, soft-delete only, can move to Partially Paid or Paid.
 - **Partially Paid** → soft-delete only (no hard delete once any payment has been recorded), can move to Paid.
@@ -130,15 +139,17 @@ A Progressive Web Application for creating and managing invoices, clients, and o
 
 ## 2. Client Module
 
-*(Previously called "Vendor" — renamed here since this party is being invoiced, not paid by the organization. If "Vendor" is intentional in your business context, keep the original term.)*
+_(Previously called "Vendor" — renamed here since this party is being invoiced, not paid by the organization. If "Vendor" is intentional in your business context, keep the original term.)_
 
 ### 2a. Client List Page
+
 - Page title "Clients".
 - Client cards showing: Name, GST number (if present), Address, Contact details, Email, Total pending invoice count.
 - Cards are clickable → navigates to Client Details page.
 - Pagination.
 
 ### 2b. Client Details Page
+
 - Title with Delete and Edit buttons.
 - Client details card: Name, GST no., Address, Contact details, Email, Total pending invoice count.
 - Tabs: All / Paid / Unpaid, each showing counts.
@@ -147,10 +158,12 @@ A Progressive Web Application for creating and managing invoices, clients, and o
 - Pagination for this invoice section.
 
 ### 2c. Add / Edit Client
+
 - Fields: Name, GST number (if present), Address, State, Country, Contact details, Email.
 - More fields to be added later as needed.
 
 **Behavior / Flow**
+
 - **Validation:** GST number format validation, plus duplicate detection on GST number and client name (scoped per-organization, since multi-org is supported — see Org Module).
 - **Delete:**
   - If the client has zero invoices (including zero soft-deleted invoices) → permanently deleted.
@@ -173,10 +186,11 @@ A Progressive Web Application for creating and managing invoices, clients, and o
   - More fields to be added later as needed.
 
 **Multi-Organization Support**
+
 - A user can belong to and manage multiple organizations.
 - Clients and Invoices are scoped per-organization (not shared across orgs a user belongs to).
 - Invoice numbering series is independent per organization.
-- GST split logic uses the *currently active* organization's state as the reference point.
+- GST split logic uses the _currently active_ organization's state as the reference point.
 - All list pages, dashboards, and calendars operate within the context of the currently selected organization (implies an org switcher in the UI).
 - Roles/permissions across multiple users on one org are not yet defined — flagged for later.
 
@@ -187,6 +201,7 @@ A Progressive Web Application for creating and managing invoices, clients, and o
 These are acknowledged but intentionally out of scope for the first build:
 
 **Auth**
+
 - Sign up via Google, and via email + password.
 - Forgot password flow.
 - Email verification.
@@ -194,10 +209,12 @@ These are acknowledged but intentionally out of scope for the first build:
 - Session handling / token refresh.
 
 **PWA-specific**
+
 - Offline behavior — viewing/creating invoices offline with sync-on-reconnect (typically the core reason to build as a PWA; worth revisiting if this stays deferred long-term).
 - Push notifications (e.g., payment reminders).
 
 **Other future considerations**
+
 - Export invoices/clients to CSV or Excel.
 - Email/share invoice directly to client (beyond just download).
 - Analytics/dashboard view (revenue over time, top clients).

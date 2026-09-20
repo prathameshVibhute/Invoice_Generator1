@@ -1,1 +1,4 @@
-import { ClientListScreen } from "@invoice-generator/modules"; export default function Page(){return <ClientListScreen/>;}
+import { ClientListScreen } from "@invoice-generator/modules";
+export default function Page() {
+  return <ClientListScreen />;
+}
