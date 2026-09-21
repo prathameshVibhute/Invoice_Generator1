@@ -4,6 +4,8 @@ import Link from "next/link";
 import { IconPlus, IconSettings } from "@tabler/icons-react";
 import { invoices } from "../data";
 import { Calendar, InvoiceCard } from "../shared";
+import { Button } from "@invoice-generator/ui/button";
+
 export function InvoiceListScreen() {
   const [tab, setTab] = useState("all");
   const listed = invoices.filter((invoice) =>
@@ -21,13 +23,19 @@ export function InvoiceListScreen() {
           </div>
         </div>
         <div className="actions">
-          <Link className="icon-button" href="/organization">
-            <IconSettings className="w-5 h-5" />
-          </Link>
-          <Link className="button" href="/invoices/new">
-            <IconPlus className="w-5 h-5" />
-            Add invoice
-          </Link>
+          <Button
+            icon={IconSettings}
+            routeUrl="/organization"
+            className="flex items-center rounded-xl border border-border bg-surface p-3"
+          />
+          <Button
+            icon={IconPlus}
+            iconClassName="text-surface"
+            routeUrl="/invoices/new"
+            className="flex items-center rounded-xl p-3 text-surface bg-primary"
+            label="Add invoice"
+            labelClassName="text-surface"
+          />
         </div>
       </header>
       <Calendar />

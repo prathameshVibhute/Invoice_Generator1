@@ -1,9 +1,20 @@
 @import "tailwindcss";
+@source "../../../packages/modules";
+@source "../../../packages/ui";
+
+@theme {
+  --color-border: #e6eaf1;
+  --color-primary: #315cf6;
+  --color-muted: #708098;
+  --color-surface: #ffffff;
+  --color-text-primary: #172033;
+}
 
 :root {
   --color-primary: #315cf6;
   --color-primary-soft: #e9edff;
   --color-surface: #ffffff;
+  --color-background: #f2f3f5;
   --color-canvas: #f6f7fb;
   --color-text-primary: #172033;
   --color-text-muted: #708098;
@@ -280,46 +291,5 @@ a {
   .form-grid,
   .detail-grid {
     grid-template-columns: 1fr;
-  }
-}
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --color-primary: #2563eb;
-  --color-surface: #ffffff;
-  --color-background: #f2f3f5;
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-border: #e2e8f0;
-  --color-status-paid: #16a34a;
-  --color-status-unpaid: #dc2626;
-  --color-status-draft: #64748b;
-  --color-status-partial: #d97706;
-
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.5rem;
-}
-
-html,
-body {
-  height: 100%;
-}
-
-body {
-  background: var(--color-background);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-base);
-}
-
-/* The product is intentionally composed for a phone-sized viewport. */
-@media (min-width: 431px) {
-  body {
-    background: #e9edf3;
   }
 }

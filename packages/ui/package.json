@@ -4,6 +4,12 @@
   "private": true,
   "main": "./components/nav-bar/index.tsx",
   "types": "./components/nav-bar/index.tsx",
+  "exports": {
+    ".": "./components/nav-bar/index.tsx",
+    "./button": "./components/button/index.tsx",
+    "./avatar": "./components/avatar/index.tsx",
+    "./chip": "./components/chip/index.tsx"
+  },
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",
     "next": "^15.1.3",

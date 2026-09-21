@@ -10,8 +10,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <PwaSetup />
-        <main className="shell">{children}</main>
-        <BottomNav />
+        <div className="p-2">
+          <main className="mx-auto w-full h-screen overflow-y-scroll max-w-[430px] px-4 pb-32 pt-8 bg-surface rounded-2xl">{children}</main>
+          <BottomNav />
+        </div>
       </body>
     </html>
   );

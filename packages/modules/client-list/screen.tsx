@@ -1,6 +1,10 @@
 import Link from "next/link";
-import { IconPlus, IconSettings } from "@tabler/icons-react";
+import { IconAddressBook, IconEmailStamp, IconLocation, IconLocationCancel, IconMail, IconMap, IconMap2, IconMapPin, IconPhone, IconPhoneCall, IconPlus, IconSettings } from "@tabler/icons-react";
 import { clients, invoices } from "../data";
+import { Button } from "@invoice-generator/ui/button";
+import { Avatar } from "@invoice-generator/ui/avatar";
+import { Chip } from "@invoice-generator/ui/chip";
+
 export function ClientListScreen() {
   return (
     <>
@@ -9,14 +13,20 @@ export function ClientListScreen() {
           <h1>Clients</h1>
           <div className="org-switch">Acme Studio</div>
         </div>
-        <div className="actions">
-          <Link className="icon-button" href="/organization">
-            <IconSettings className="w-5 h-5" />
-          </Link>
-          <Link className="button" href="/clients/new">
-            <IconPlus className="w-5 h-5" />
-            Add client
-          </Link>
+        <div className="flex gap-2">
+          <Button
+            icon={IconSettings}
+            routeUrl="/organization"
+            className="flex items-center rounded-xl border border-border bg-surface p-3"
+          />
+          <Button
+            icon={IconPlus}
+            iconClassName="text-surface"
+            routeUrl="/clients/new"
+            className="flex items-center rounded-xl p-3 text-surface bg-primary"
+            label="Add client"
+            labelClassName="text-surface"
+          />
         </div>
       </header>
       <div className="list">
@@ -25,18 +35,29 @@ export function ClientListScreen() {
             (invoice) => invoice.clientId === client.id && invoice.status !== "paid",
           ).length;
           return (
-            <Link href={`/clients/${client.id}`} className="card" key={client.id}>
-              <div className="row">
-                <div>
-                  <div className="invoice-title">{client.name}</div>
-                  <div className="muted">{client.gstNo ?? "No GST number"}</div>
+            <Link href={`/clients/${client.id}`} className="p-4 flex flex-col rounded-xl gap-2 border border-border" key={client.id}>
+              <div className="border-border flex flex-column justify-between">
+                <div className="flex">
+                  <Avatar label={"de"}/>
+                  <div className="border-border ml-2">
+                    <div className="font-semibold text-md">{client.name}</div>
+                    <div className="font-regular text-xs text-muted">{client.gstNo ?? "No GST number"}</div>
+                  </div>
                 </div>
-                <span className="chip active">{pending} pending</span>
+                <Chip label={`${pending} pending`} color="orange" />
               </div>
-              <div className="muted" style={{ marginTop: 15 }}>
-                {client.address}
-                <br />
-                {client.contactDetails} · {client.email}
+              <hr className="w-full border-gray-200 my-2" />
+              <div className="flex flex-col w-full gap-1">
+                <div className="flex flex-row items-center justify-between w-full flex-wrap text-sm font-regular">
+                  <div className="flex flex-row items-center gap-2">
+                    <IconPhone className="h-5 w-5 text-muted" />
+                    <span>{client.contactDetails}</span>
+                  </div>
+                  <div className="flex flex-row items-center gap-2 text-sm">
+                    <IconMail className="h-5 w-5 text-muted" />
+                    <span>{client.email}</span>
+                  </div>
+                </div>
               </div>
             </Link>
           );
