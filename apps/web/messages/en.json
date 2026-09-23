@@ -1,0 +1,30 @@
+{
+  "invoiceList": {
+    "title": "Invoices",
+    "add": "Add invoice"
+  },
+  "clientList": {
+    "title": "Clients",
+    "add": "Add client"
+  },
+  "invoiceForm": {
+    "create": "Create invoice",
+    "draft": "Save as draft"
+  },
+  "clientForm": {
+    "edit": "Edit client",
+    "new": "New client",
+    "organizationName": "Organization Name",
+    "contactPersonDetails": "Contact Person Details",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "gstNumber": "GST number",
+    "gstNumberPlaceholder": "GST number",
+    "address": "Address",
+    "state": "State",
+    "country": "Country",
+    "contactDetails": "Contact details",
+    "email": "Email",
+    "save": "Save client"
+  }
+}

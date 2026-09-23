@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
 const nextConfig: NextConfig = {
   transpilePackages: [
     "@invoice-generator/modules",
@@ -6,4 +8,7 @@ const nextConfig: NextConfig = {
     "@invoice-generator/ui",
   ],
 };
-export default nextConfig;
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+
+export default withNextIntl(nextConfig);
