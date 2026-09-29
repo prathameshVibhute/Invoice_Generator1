@@ -1,7 +1,0 @@
-export async function request<T>(operation: () => Promise<T>): Promise<T> {
-  try {
-    return await operation();
-  } catch (error: unknown) {
-    throw error instanceof Error ? error : new Error("Request failed");
-  }
-}
