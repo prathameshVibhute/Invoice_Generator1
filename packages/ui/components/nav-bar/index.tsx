@@ -10,19 +10,10 @@ export function BottomNav() {
   ];
 
   const pathname = usePathname();
-  if (pathname.startsWith("/login") || pathname.startsWith("/signup")) return null;
-  const isInvoices = pathname.startsWith("/invoices");
+  const isInvoices = pathname === "/invoices";
+  const isClients = pathname === "/clients";
+  if (!isInvoices && !isClients) return null;
   return (
-    // <nav className="nav">
-    //   <Link href="/invoices" className={isInvoices ? "selected" : ""}>
-    //     <IconFileInvoice className="w-5 h-5" />
-    //     Invoices
-    //   </Link>
-    //   <Link href="/clients" className={pathname.startsWith("/clients") ? "selected" : ""}>
-    //     <IconUsers className="w-5 h-5" />
-    //     Clients
-    //   </Link>
-    // </nav>
     <nav
       aria-label="Primary navigation"
       className="fixed bottom-4 left-1/2 z-50 w-full max-w-[385px] -translate-x-1/2 rounded-3xl border border-border/80 bg-surface px-2 py-2 shadow-[0_-4px_24px_rgba(15,23,42,0.10)]"

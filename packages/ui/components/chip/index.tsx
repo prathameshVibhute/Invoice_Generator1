@@ -21,7 +21,7 @@ export function Chip({ label, color = "purple", className = "" }: ChipProps) {
 
     return (
         <span
-            className={`px-4 py-2 rounded-2xl text-xs font-semibold uppercase h-8 flex items-center ${className}`.trim()}
+            className={`px-3 py-2 rounded-2xl text-xs font-semibold uppercase h-8 flex items-center ${className}`.trim()}
             style={{ backgroundColor: colorPair.background, color: colorPair.foreground }}
         >
             {label}
