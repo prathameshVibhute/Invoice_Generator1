@@ -1,4 +1,7 @@
 import { z } from "zod";
+export * from "./constants";
+export * from "./forms";
+
 export const invoiceStatusSchema = z.enum(["draft", "active", "partially_paid", "paid"]);
 export type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;
 export const invoiceItemSchema = z.object({
@@ -11,20 +14,28 @@ export const invoiceItemSchema = z.object({
   total: z.number(),
 });
 export type InvoiceItem = z.infer<typeof invoiceItemSchema>;
+
+// Client schema
 export const clientSchema = z.object({
   id: z.string(),
   orgId: z.string(),
-  name: z.string(),
-  gstNo: z.string().nullable(),
+  clientName: z.string(),
+  contactPersonDetails: z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+  }),
+  gstNumber: z.string().nullable(),
   address: z.string(),
   state: z.string(),
   country: z.string(),
   contactDetails: z.string(),
   email: z.string(),
+  pendingInvoiceCount: z.number(),
   isDeleted: z.boolean(),
   createdAt: z.string(),
 });
 export type Client = z.infer<typeof clientSchema>;
+
 export const invoiceSchema = z.object({
   id: z.string(),
   orgId: z.string(),
@@ -49,7 +60,7 @@ export const organizationSchema = z.object({
   address: z.string(),
   state: z.string(),
   country: z.string(),
-  gstNo: z.string().nullable(),
+  gstNumber: z.string().nullable(),
   logoUrl: z.string().nullable(),
   signatureUrl: z.string().nullable(),
   contactDetails: z.string(),

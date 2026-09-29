@@ -1,51 +1,25 @@
-import Link from "next/link";
-import { IconArrowLeft } from "@tabler/icons-react";
-import { clients } from "../data";
-export function ClientFormScreen({ id }: { id?: string }) {
-  const client = clients.find((item) => item.id === id);
+"use client";
+
+import { type ClientFormValues } from "@invoice-generator/types";
+import type { Client } from "@invoice-generator/types";
+import { FormType } from "./constants";
+import { ClientFormHeader } from "./components/client-form-header";
+import { ClientFormContainer } from "./components/client-form-container";
+type NewClient = Omit<Client, "id" | "orgId" | "createdAt" | "isDeleted">;
+
+interface ClientFormScreen {
+  id?: string;
+  addClientAction: (client: NewClient) => Promise<Client>;
+}
+
+export function ClientFormScreen({ id, addClientAction }: ClientFormScreen) {
+
   return (
     <>
-      <header className="page-head">
-        <Link className="icon-button" href="/clients">
-          <IconArrowLeft className="w-5 h-5" />
-        </Link>
-        <h1>{client ? "Edit client" : "New client"}</h1>
-      </header>
-      <section className="card">
-        <div className="form-grid">
-          <label className="field">
-            Name
-            <input defaultValue={client?.name} />
-          </label>
-          <label className="field">
-            GST number
-            <input placeholder="29ABCDE1234F1Z5" defaultValue={client?.gstNo ?? ""} />
-          </label>
-          <label className="field">
-            Address
-            <input defaultValue={client?.address} />
-          </label>
-          <label className="field">
-            State
-            <input defaultValue={client?.state} />
-          </label>
-          <label className="field">
-            Country
-            <input defaultValue={client?.country ?? "India"} />
-          </label>
-          <label className="field">
-            Contact details
-            <input defaultValue={client?.contactDetails} />
-          </label>
-        </div>
-        <label className="field">
-          Email
-          <input type="email" defaultValue={client?.email} />
-        </label>
-      </section>
-      <button className="button" style={{ marginTop: 16 }}>
-        Save client
-      </button>
-    </>
+      {/* Header section */}
+      <ClientFormHeader formType={id ? FormType.Edit : FormType.New } />
+      {/* Form Container */}
+      <ClientFormContainer addClientAction={addClientAction} />
+    </>      
   );
 }
