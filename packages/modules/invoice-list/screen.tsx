@@ -27,6 +27,7 @@ export function InvoiceListScreen() {
             icon={IconSettings}
             routeUrl="/organization"
             className="flex items-center rounded-xl border border-border bg-surface p-3"
+            type="button"
           />
           <Button
             icon={IconPlus}
@@ -35,6 +36,7 @@ export function InvoiceListScreen() {
             className="flex items-center rounded-xl p-3 text-surface bg-primary"
             label="Add invoice"
             labelClassName="text-surface"
+            type="button"
           />
         </div>
       </header>

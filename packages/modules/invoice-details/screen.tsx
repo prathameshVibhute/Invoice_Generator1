@@ -39,7 +39,7 @@ export function InvoiceDetailsScreen({ id }: { id: string }) {
           </div>
           <div>
             <span>GST number</span>
-            <strong>{client.gstNo ?? "—"}</strong>
+            <strong>{client.gstNumber ?? "—"}</strong>
           </div>
           <div>
             <span>Invoice amount</span>

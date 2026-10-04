@@ -2,5 +2,7 @@ packages:
   - apps/*
   - packages/*
 allowBuilds:
+  '@firebase/util': set this to true or false
   '@parcel/watcher': set this to true or false
   '@swc/core': set this to true or false
+  protobufjs: set this to true or false

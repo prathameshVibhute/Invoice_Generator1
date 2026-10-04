@@ -1,7 +1,9 @@
+"use client";
 import Link from "next/link";
-import { IconAddressBook, IconEmailStamp, IconLocation, IconLocationCancel, IconMail, IconMap, IconMap2, IconMapPin, IconPhone, IconPhoneCall, IconPlus, IconSettings } from "@tabler/icons-react";
+import { IconMail, IconPhone, IconPlus, IconSettings } from "@tabler/icons-react";
 import { clients, invoices } from "../data";
 import { Button } from "@invoice-generator/ui/button";
+import { Pagination } from "@invoice-generator/ui/pagination";
 import { Avatar } from "@invoice-generator/ui/avatar";
 import { Chip } from "@invoice-generator/ui/chip";
 
@@ -18,6 +20,7 @@ export function ClientListScreen() {
             icon={IconSettings}
             routeUrl="/organization"
             className="flex items-center rounded-xl border border-border bg-surface p-3"
+            type="button"
           />
           <Button
             icon={IconPlus}
@@ -26,6 +29,7 @@ export function ClientListScreen() {
             className="flex items-center rounded-xl p-3 text-surface bg-primary"
             label="Add client"
             labelClassName="text-surface"
+            type="button"
           />
         </div>
       </header>
@@ -41,7 +45,7 @@ export function ClientListScreen() {
                   <Avatar label={"de"}/>
                   <div className="border-border ml-2">
                     <div className="font-semibold text-md">{client.name}</div>
-                    <div className="font-regular text-xs text-muted">{client.gstNo ?? "No GST number"}</div>
+                    <div className="font-regular text-xs text-muted">{client.gstNumber ?? "No GST number"}</div>
                   </div>
                 </div>
                 <Chip label={`${pending} pending`} color="orange" />
@@ -62,6 +66,9 @@ export function ClientListScreen() {
             </Link>
           );
         })}
+      </div>
+      <div className="mt-2">
+        <Pagination totalNumber={clients.length} />
       </div>
     </>
   );

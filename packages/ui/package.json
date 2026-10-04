@@ -9,7 +9,8 @@
     "./button": "./components/button/index.tsx",
     "./avatar": "./components/avatar/index.tsx",
     "./chip": "./components/chip/index.tsx",
-    "./dropdown": "./components/dropdown/index.tsx"
+    "./dropdown": "./components/dropdown/index.tsx",
+    "./pagination": "./components/pagination/index.tsx"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",

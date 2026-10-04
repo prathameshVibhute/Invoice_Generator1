@@ -21,7 +21,7 @@ export function ClientDetailsScreen({ id }: { id: string }) {
         <div className="detail-grid">
           <div>
             <span>GST number</span>
-            <strong>{client.gstNo ?? "—"}</strong>
+            <strong>{client.gstNumber ?? "—"}</strong>
           </div>
           <div>
             <span>Pending invoices</span>

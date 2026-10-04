@@ -18,7 +18,7 @@ export function OrganizationScreen() {
           </label>
           <label className="field">
             GST number
-            <input defaultValue={organization.gstNo ?? ""} />
+            <input defaultValue={organization.gstNumber ?? ""} />
           </label>
           <label className="field">
             Address

@@ -27,9 +27,9 @@ export function InvoiceCard({ invoice }: { invoice: Invoice }) {
       </div>
       <div className="row" style={{ marginTop: 14 }}>
         <div>
-          <strong>{client.name}</strong>
+          <strong>{client.clientName}</strong>
           <div className="muted">
-            {invoice.isGstInvoice ? (client.gstNo ?? "GST invoice") : "Non-GST invoice"}
+            {invoice.isGstInvoice ? (client.gstNumber ?? "GST invoice") : "Non-GST invoice"}
           </div>
         </div>
         <strong>{money(invoice.total)}</strong>
