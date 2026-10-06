@@ -5,7 +5,11 @@
   },
   "clientList": {
     "title": "Clients",
-    "add": "Add client"
+    "add": "Add client",
+    "noGstLabel": "No GST number",
+    "addPhoneNumberLabel": "Add phone number",
+    "addEmailIdLabel": "Add email",
+    "pendingInvoiceCountChipLabel": "Pending"
   },
   "invoiceForm": {
     "create": "Create invoice",

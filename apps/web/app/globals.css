@@ -127,10 +127,6 @@ a {
   color: var(--color-primary);
   border-color: var(--color-primary);
 }
-.list {
-  display: grid;
-  gap: 11px;
-}
 .invoice-card {
   display: block;
 }

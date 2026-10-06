@@ -7,6 +7,7 @@
       }
     ],
     "paths": {
+      "@invoice-generator/ui/*": ["../../packages/ui/components/*/index.tsx"],
       "@invoice-generator/*": ["../../packages/*"]
     },
     "allowJs": false,

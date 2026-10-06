@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { Dropdown } from "@invoice-generator/ui/dropdown";
 import { Button } from "@invoice-generator/ui/button";
 import { Client, clientFormSchema, ClientFormValues, STATE } from "@invoice-generator/types";
@@ -20,10 +20,11 @@ type ClientFormErrors = Omit<
 };
 
 interface ClientFormContainerProps {
-      addClientAction: (client: NewClient) => Promise<Client>;
+    id?: string;
+    addClientAction: (client: NewClient) => Promise<Client>;
 }
 
-export function ClientFormContainer({addClientAction}: ClientFormContainerProps) {
+export function ClientFormContainer({id, addClientAction}: ClientFormContainerProps) {
     const t = useTranslations("clientForm");
     const router = useRouter();
     const client = clients.find((item) => item.id === id);
@@ -35,7 +36,7 @@ export function ClientFormContainer({addClientAction}: ClientFormContainerProps)
     },
     gstNumber: client?.gstNumber ?? "",
     address: client?.address ?? "",
-    state: client?.state ?? STATE[25]?.stateName,
+    state: client?.state ?? STATE[25]?.stateName ?? "",
     country: client?.country ?? "India",
     contactDetails: client?.contactDetails ?? "",
     email: client?.email ?? "",

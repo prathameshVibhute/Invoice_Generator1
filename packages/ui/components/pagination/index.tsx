@@ -43,7 +43,7 @@ export function Pagination({
   const go = (nextPage: number) => {
     const safePage = Math.min(totalPages, Math.max(1, nextPage));
     setPage(safePage);
-    // onPageChange?.(safePage);
+    onPageChange?.(safePage);
   };
 
   return (

@@ -19,7 +19,10 @@ export function ClientFormScreen({ id, addClientAction }: ClientFormScreen) {
       {/* Header section */}
       <ClientFormHeader formType={id ? FormType.Edit : FormType.New } />
       {/* Form Container */}
-      <ClientFormContainer addClientAction={addClientAction} />
+      <ClientFormContainer
+        {...(id !== undefined ? { id } : {})}
+        addClientAction={addClientAction}
+      />
     </>      
   );
 }
