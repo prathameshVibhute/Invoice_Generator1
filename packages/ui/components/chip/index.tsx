@@ -17,7 +17,7 @@ const colors: Record<ChipColor, string> = {
 export function Chip({ label, color = "purple", className = "" }: ChipProps) {
   return (
     <span
-      className={`flex h-8 items-center rounded-2xl px-3 py-2 text-xs font-semibold uppercase ${colors[color]} ${className}`.trim()}
+      className={`flex min-h-8 items-center rounded-2xl px-3 py-2 text-xs font-semibold uppercase ${colors[color]} ${className}`.trim()}
     >
       {label}
     </span>

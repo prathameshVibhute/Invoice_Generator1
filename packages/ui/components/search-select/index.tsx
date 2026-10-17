@@ -240,7 +240,7 @@ export function SearchSelect<TData = unknown>({
                     isHighlighted ? "bg-slate-100" : "hover:bg-slate-100"
                   }`}
                 >
-                  <span>{option.label}</span>
+                  <span className="min-w-0 flex-1 break-words">{option.label}</span>
                   {isSelected && (
                     <IconCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-blue-600" />
                   )}

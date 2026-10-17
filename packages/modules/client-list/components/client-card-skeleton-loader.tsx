@@ -2,7 +2,7 @@ export function ClientCardSkeletonLoader() {
   return (
     <article
       aria-hidden="true"
-      className="flex animate-pulse flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4"
+      className="flex min-w-0 animate-pulse flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">

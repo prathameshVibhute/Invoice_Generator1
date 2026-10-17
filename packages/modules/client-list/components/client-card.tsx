@@ -21,24 +21,30 @@ export function ClientCard({ client }: ClientCardProps) {
 
   return (
     <article
-      className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4"
+      className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4"
       key={client.id}
     >
-      <div className="flex items-center justify-between gap-3">
-        <Link href={`/clients/${client.id}`} className="flex min-w-0 items-center gap-3">
+      <div className="flex items-start justify-between gap-3">
+        <Link href={`/clients/${client.id}`} className="flex min-w-0 flex-1 items-center gap-3">
           <Avatar label={avatarLabel} />
           <div className="min-w-0">
             <div className="truncate text-base font-semibold">{client.clientName}</div>
-            <div className="text-sm text-slate-500">{client.gstNumber || t("noGstLabel")}</div>
+            <div className="truncate text-sm text-slate-500">
+              {client.gstNumber || t("noGstLabel")}
+            </div>
           </div>
         </Link>
-        <Chip label={`${pending} ${t("pendingInvoiceCountChipLabel")}`} color="orange" />
+        <Chip
+          label={`${pending} ${t("pendingInvoiceCountChipLabel")}`}
+          color="orange"
+          className="max-w-[45%] shrink-0 whitespace-normal text-center leading-tight"
+        />
       </div>
       <div className="flex flex-col gap-2 border-t border-slate-200 pt-3 text-sm">
         {client.contactDetails ? (
-          <div className="flex items-center gap-2 text-slate-500">
+          <div className="flex min-w-0 items-center gap-2 text-slate-500">
             <IconPhone className="h-5 w-5 shrink-0" />
-            <span>{client.contactDetails}</span>
+            <span className="min-w-0 break-all">{client.contactDetails}</span>
           </div>
         ) : (
           <Link href={`/clients/${client.id}/edit`} className="flex items-center gap-2 font-normal">
@@ -47,9 +53,9 @@ export function ClientCard({ client }: ClientCardProps) {
           </Link>
         )}
         {client.email ? (
-          <div className="flex items-center gap-2 text-slate-500">
+          <div className="flex min-w-0 items-center gap-2 text-slate-500">
             <IconMail className="h-5 w-5 shrink-0" />
-            <span>{client.email}</span>
+            <span className="min-w-0 break-all">{client.email}</span>
           </div>
         ) : (
           <Link

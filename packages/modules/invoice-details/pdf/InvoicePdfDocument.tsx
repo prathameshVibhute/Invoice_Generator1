@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
   page: {
     padding: 32,
     backgroundColor: "#ffffff",
-    fontFamily: "NotoSans",
+    fontFamily: "Montserrat",
   },
   header: {
     display: "flex",

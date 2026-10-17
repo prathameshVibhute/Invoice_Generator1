@@ -25,8 +25,8 @@ export function InvoiceCard({ invoice }: { invoice: Invoice }) {
       href={`/invoices/${invoice.id}`}
     >
       <div className="flex items-start justify-between gap-2.5">
-        <div>
-          <div className="font-bold">{invoice.invoiceNumber}</div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate font-bold">{invoice.invoiceNumber}</div>
           <div className="text-sm text-slate-500">
             {new Date(invoice.createdAt).toLocaleDateString("en-IN", {
               day: "numeric",
@@ -37,14 +37,16 @@ export function InvoiceCard({ invoice }: { invoice: Invoice }) {
         </div>
         <StatusChip status={invoice.status} />
       </div>
-      <div className="mt-3.5 flex items-start justify-between gap-2.5">
-        <div>
-          <strong>{client.clientName}</strong>
-          <div className="text-sm text-slate-500">
+      <div className="mt-3.5 flex min-w-0 items-start justify-between gap-2.5">
+        <div className="min-w-0 flex-1">
+          <strong className="block truncate">{client.clientName}</strong>
+          <div className="truncate text-sm text-slate-500">
             {invoice.isGstInvoice ? (client.gstNumber ?? "GST invoice") : "Non-GST invoice"}
           </div>
         </div>
-        <strong>{money(invoice.total)}</strong>
+        <strong className="block max-w-[45%] shrink-0 break-words text-right">
+          {money(invoice.total)}
+        </strong>
       </div>
     </Link>
   );

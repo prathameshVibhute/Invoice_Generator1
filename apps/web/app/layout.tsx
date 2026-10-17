@@ -1,7 +1,16 @@
 import "./globals.css";
 import { BottomNav, PwaSetup } from "@invoice-generator/ui";
 import { NextIntlClientProvider } from "next-intl";
+import { Montserrat } from "next/font/google";
 import messages from "../messages/en.json";
+
+const montserrat = Montserrat({
+  subsets: ["latin", "latin-ext"],
+  style: ["normal", "italic"],
+  variable: "--font-montserrat",
+  display: "swap",
+});
+
 export const metadata = {
   title: "InvoiceFlow",
   description: "Simple invoices for small businesses",
@@ -9,7 +18,7 @@ export const metadata = {
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={montserrat.variable}>
       <body className="m-0 h-screen bg-slate-100 font-sans text-slate-900">
         <NextIntlClientProvider locale="en" messages={messages}>
           <PwaSetup />

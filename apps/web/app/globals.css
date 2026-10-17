@@ -1,3 +1,22 @@
 @import "tailwindcss";
 @source "../../../packages/modules";
 @source "../../../packages/ui";
+
+:root {
+  --font-family-base: var(--font-montserrat), system-ui, sans-serif;
+}
+
+@theme inline {
+  --font-sans: var(--font-family-base);
+}
+
+body {
+  font-family: var(--font-family-base);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}

@@ -2,10 +2,10 @@ import { Font } from "@react-pdf/renderer";
 
 export function registerPdfFonts(): void {
   Font.register({
-    family: "NotoSans",
+    family: "Montserrat",
     fonts: [
-      { src: "/fonts/NotoSans-Regular.ttf", fontWeight: 400 },
-      { src: "/fonts/NotoSans-Bold.ttf", fontWeight: 700 },
+      { src: "/fonts/Montserrat-Regular.ttf", fontWeight: 400 },
+      { src: "/fonts/Montserrat-Bold.ttf", fontWeight: 700 },
     ],
   });
   Font.registerHyphenationCallback((word) => [word]);

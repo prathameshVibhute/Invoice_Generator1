@@ -12,7 +12,7 @@ export const pdfTheme = {
   page: {
     backgroundColor: "#ffffff",
     color: "#0f172a",
-    fontFamily: "NotoSans",
+    fontFamily: "Montserrat",
   },
   heading: {
     fontSize: 18,
