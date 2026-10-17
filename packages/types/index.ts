@@ -1,13 +1,13 @@
 import { z } from "zod";
 export * from "./constants";
 export * from "./forms";
+export * from "./invoicePdf";
 
 export const invoiceStatusSchema = z.enum(["draft", "active", "partially_paid", "paid"]);
 export type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;
 export const invoiceItemSchema = z.object({
   id: z.string(),
   itemName: z.string(),
-  hsnSacCode: z.string(),
   quantity: z.number(),
   gstPercentage: z.number().nullable(),
   rate: z.number(),

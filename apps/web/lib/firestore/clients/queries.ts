@@ -20,13 +20,21 @@ export async function getClientById(orgId: string = "n4u3mv4HPuAhPxs3Dot7", clie
   return client.orgId === orgId && !client.isDeleted ? client : null;
 }
 
-export async function getClients(orgId: string = "n4u3mv4HPuAhPxs3Dot7"): Promise<Client[]> {
-  const clientsQuery = query(collection(db, "invoice_generation_clients"), where("orgId", "==", orgId));
+export async function getClients(orgId: string = "n4u3mv4HPuAhPxs3Dot7", searchValue?: string): Promise<Client[]> {
+  const normalizedSearch = searchValue?.trim().toLowerCase();
+  const clientsQuery = query(
+    collection(db, "invoice_generation_clients"),
+    where("orgId", "==", orgId),
+  );
   const snapshot = await getDocs(clientsQuery);
 
   return snapshot.docs
     .map((clientSnapshot) => ({ ...clientSnapshot.data(), id: clientSnapshot.id }) as Client)
     .filter((client) => !client.isDeleted)
+    .filter((client) => {
+      if (!normalizedSearch) return true;
+      return client.clientName.toLowerCase().includes(normalizedSearch);
+    })
     .sort((first, second) => second.createdAt.localeCompare(first.createdAt));
 }
 

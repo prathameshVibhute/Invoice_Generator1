@@ -7,6 +7,7 @@ import {
   IconChevronsRight,
 } from "@tabler/icons-react";
 import { useState } from "react";
+import { Button } from "../button";
 
 export interface PaginationProps {
   /** Total number of records to paginate. */
@@ -38,7 +39,7 @@ export function Pagination({
   const lastDisabled = currentPage >= totalPages;
 
   const buttonClass = (disabled: boolean) =>
-    `inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-muted transition-colors active:bg-canvas active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${disabled ? "cursor-not-allowed opacity-40" : "hover:bg-canvas"}`;
+    `inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-colors active:scale-95 active:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${disabled ? "cursor-not-allowed opacity-40" : "hover:bg-slate-100"}`;
 
   const go = (nextPage: number) => {
     const safePage = Math.min(totalPages, Math.max(1, nextPage));
@@ -49,9 +50,9 @@ export function Pagination({
   return (
     <nav
       aria-label="Pagination"
-      className={`card flex w-full items-center justify-between gap-1 bg-canvas p-2 sm:justify-center sm:gap-2 ${className}`.trim()}
-      >
-      <button
+      className={`flex w-full items-center justify-between gap-1 rounded-2xl border border-slate-200 bg-slate-50 p-2 sm:justify-center sm:gap-2 ${className}`.trim()}
+    >
+      <Button
         type="button"
         aria-label="First page"
         disabled={firstDisabled}
@@ -59,8 +60,8 @@ export function Pagination({
         className={buttonClass(firstDisabled)}
       >
         <IconChevronsLeft aria-hidden="true" />
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
         aria-label="Previous page"
         disabled={firstDisabled}
@@ -68,18 +69,22 @@ export function Pagination({
         className={buttonClass(firstDisabled)}
       >
         <IconChevronLeft aria-hidden="true" />
-      </button>
+      </Button>
       <div
-        className="flex min-w-0 flex-1 items-center justify-center gap-2 px-1 text-sm font-medium text-muted sm:flex-none sm:min-w-32"
+        className="flex min-w-0 flex-1 items-center justify-center gap-2 px-1 text-sm font-medium text-slate-500 sm:min-w-32 sm:flex-none"
         aria-live="polite"
         aria-atomic="true"
       >
         <>
-          <span className="hidden whitespace-nowrap sm:inline">Page {currentPage} of {totalPages}</span>
-          <span className="whitespace-nowrap sm:hidden">{currentPage} / {totalPages}</span>
+          <span className="hidden whitespace-nowrap sm:inline">
+            Page {currentPage} of {totalPages}
+          </span>
+          <span className="whitespace-nowrap sm:hidden">
+            {currentPage} / {totalPages}
+          </span>
         </>
       </div>
-      <button
+      <Button
         type="button"
         aria-label="Next page"
         disabled={lastDisabled}
@@ -87,8 +92,8 @@ export function Pagination({
         className={buttonClass(lastDisabled)}
       >
         <IconChevronRight aria-hidden="true" />
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
         aria-label="Last page"
         disabled={lastDisabled}
@@ -96,7 +101,7 @@ export function Pagination({
         className={buttonClass(lastDisabled)}
       >
         <IconChevronsRight aria-hidden="true" />
-      </button>
+      </Button>
     </nav>
   );
 }

@@ -1,29 +1,28 @@
 interface AvatarProps {
-    label: string;
+  label: string;
 }
 
 const avatarColors = [
-    { background: "#eeecff", foreground: "#5145cd" },
-    { background: "#e4f6f3", foreground: "#168b78" },
-    { background: "#fff0e3", foreground: "#c66b1d" },
-    { background: "#ffe8ed", foreground: "#c13d5a" },
-    { background: "#e8f0ff", foreground: "#3563c8" },
+  "bg-violet-100 text-violet-700",
+  "bg-teal-100 text-teal-700",
+  "bg-orange-100 text-orange-700",
+  "bg-rose-100 text-rose-700",
+  "bg-blue-100 text-blue-700",
 ];
 
 function getAvatarColor(label: string) {
-    const hash = [...label].reduce((total, character) => total + character.charCodeAt(0), 0);
-    return avatarColors[hash % avatarColors.length] ?? { background: "#eeecff", foreground: "#5145cd" };
+  const hash = [...label].reduce((total, character) => total + character.charCodeAt(0), 0);
+  return avatarColors[hash % avatarColors.length] ?? avatarColors[0]!;
 }
 
-export function Avatar({label}: AvatarProps) {
-    const color = getAvatarColor(label);
+export function Avatar({ label }: AvatarProps) {
+  const color = getAvatarColor(label);
 
-    return (
-        <div
-            className="h-10 w-10 shrink-0 flex items-center justify-center rounded-full font-bold uppercase"
-            style={{ backgroundColor: color.background, color: color.foreground }}
-        >
-            <span className="text-sm">{label}</span>
-        </div>
-    );
+  return (
+    <div
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold uppercase ${color}`}
+    >
+      <span className="text-sm">{label}</span>
+    </div>
+  );
 }

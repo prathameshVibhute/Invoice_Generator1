@@ -10,6 +10,6 @@ export async function addClientAction(client: NewClient): Promise<Client> {
 	return addClient("n4u3mv4HPuAhPxs3Dot7", client);
 }
 
-export async function getClientsAction(): Promise<Client[]> {
-	return getClients();
+export async function getClientsAction(searchValue?: string): Promise<Client[]> {
+	return getClients("n4u3mv4HPuAhPxs3Dot7",searchValue);
 }

@@ -16,7 +16,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Primary navigation"
-      className="fixed bottom-4 left-1/2 z-50 w-full max-w-[385px] -translate-x-1/2 rounded-3xl border border-border/80 bg-surface px-2 py-2 shadow-[0_-4px_24px_rgba(15,23,42,0.10)]"
+      className="fixed bottom-4 left-1/2 z-50 w-full max-w-[385px] -translate-x-1/2 rounded-3xl border border-slate-200/80 bg-white px-2 py-2 shadow-[0_-4px_24px_rgba(15,23,42,0.10)]"
     >
       <div className="flex items-center justify-around">
         {items.map(({ href, label, icon: Icon }) => {
@@ -26,7 +26,7 @@ export function BottomNav() {
             <Link
               aria-current={isActive ? "page" : undefined}
               className={`flex min-w-28 flex-col items-center gap-1 rounded-2xl px-5 py-1.5 text-sm transition-colors ${
-                isActive ? "font-bold text-text-primary" : "font-semibold text-slate-400"
+                isActive ? "font-bold text-slate-900" : "font-semibold text-slate-400"
               }`}
               href={href}
               key={href}
