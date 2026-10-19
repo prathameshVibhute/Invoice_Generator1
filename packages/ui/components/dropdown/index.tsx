@@ -17,6 +17,7 @@ interface DropdownProps {
   placeholder?: string;
   onChange?: (value: string) => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export function Dropdown({
@@ -26,6 +27,7 @@ export function Dropdown({
   placeholder = "Select an option",
   onChange,
   className = "",
+  disabled = false,
 }: DropdownProps) {
   const [internalValue, setInternalValue] = useState(defaultValue ?? "");
   const [isOpen, setIsOpen] = useState(false);
@@ -58,16 +60,19 @@ export function Dropdown({
         type="button"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
+        disabled={disabled}
         onClick={() => setIsOpen((open) => !open)}
-        className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-3 text-left"
+        className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-3 text-left disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60"
       >
-        <span className={selectedOption ? "text-slate-900" : "text-slate-500"}>
+        <span
+          className={`min-w-0 flex-1 break-words ${selectedOption ? "text-slate-900" : "text-slate-500"}`}
+        >
           {selectedOption?.label ?? placeholder}
         </span>
         <IconChevronDown className={`h-5 w-5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </Button>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div
           role="listbox"
           aria-label="Dropdown options"
@@ -85,7 +90,7 @@ export function Dropdown({
                 onClick={() => handleSelect(option)}
                 className="flex w-full items-center justify-between px-3 py-3 text-left hover:bg-slate-50"
               >
-                <span>{option.label}</span>
+                <span className="min-w-0 flex-1 break-words">{option.label}</span>
                 {isSelected && <IconCheck className="h-5 w-5 text-blue-600" aria-hidden="true" />}
               </Button>
             );

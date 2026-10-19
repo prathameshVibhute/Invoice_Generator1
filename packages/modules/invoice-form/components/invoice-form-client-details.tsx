@@ -1,46 +1,18 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import type { Client, Invoice } from "@invoice-generator/types";
+import { useCallback, useState } from "react";
+import type { Client, Invoice, Organization } from "@invoice-generator/types";
 import { SearchSelect, type SearchSelectOption } from "@invoice-generator/ui/search-select";
-import { clients, organization } from "../../data";
-
-function toDateInputValue(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function addCalendarMonths(dateValue: string, months: number): string {
-  const parts = dateValue.split("-");
-  if (parts.length !== 3) {
-    throw new Error(`Invalid date value: ${dateValue}`);
-  }
-
-  const year = Number(parts[0]);
-  const month = Number(parts[1]);
-  const day = Number(parts[2]);
-  if (
-    ![year, month, day].every(Number.isInteger) ||
-    month < 1 ||
-    month > 12 ||
-    day < 1 ||
-    day > new Date(year, month, 0).getDate()
-  ) {
-    throw new Error(`Invalid date value: ${dateValue}`);
-  }
-
-  const targetMonth = month - 1 + months;
-  const lastDayOfTargetMonth = new Date(year, targetMonth + 1, 0).getDate();
-  return toDateInputValue(new Date(year, targetMonth, Math.min(day, lastDayOfTargetMonth)));
-}
+import { Checkbox } from "@invoice-generator/ui/checkbox";
 
 interface InvoiceFormClientDetailsProps {
   invoice?: Invoice;
-  clientId: string;
-  onClientChange: (clientId: string) => void;
-  onClientStateChange: (state: string) => void;
+  initialClient: Client | null;
+  organization: Organization;
+  invoiceNumber: string;
+  issueDate: string;
+  dueDate: string;
+  onClientChange: (client: Client | null) => void;
   gst: boolean;
   onGstChange: (gst: boolean) => void;
   getClientsAction: (clientName: string) => Promise<Client[]>;
@@ -48,25 +20,25 @@ interface InvoiceFormClientDetailsProps {
 
 export function InvoiceFormClientDetails({
   invoice,
-  clientId,
+  initialClient,
+  organization,
+  invoiceNumber,
+  issueDate,
+  dueDate,
   onClientChange,
-  onClientStateChange,
   gst,
   onGstChange,
   getClientsAction,
 }: InvoiceFormClientDetailsProps) {
-  const [issueDate] = useState(() => toDateInputValue(new Date()));
-  const dueDate = addCalendarMonths(issueDate, 3);
   const [includeSignature, setIncludeSignature] = useState(
     Boolean(invoice?.signatureUrl ?? organization.signatureUrl),
   );
-  const client = clients.find((entry) => entry.id === clientId);
   const [selectedClient, setSelectedClient] = useState<SearchSelectOption<Client> | null>(() => {
-    const initialClient = clients.find((entry) => entry.id === clientId);
     return initialClient
       ? { value: initialClient.id, label: initialClient.clientName, data: initialClient }
       : null;
   });
+  const client = selectedClient?.data;
   const searchClients = useCallback(
     async (query: string): Promise<SearchSelectOption<Client>[]> => {
       const normalizedQuery = query.trim();
@@ -84,56 +56,45 @@ export function InvoiceFormClientDetails({
   return (
     <>
       <section aria-labelledby="client-details-heading" className="mb-5">
-        <h2 id="client-details-heading" className="mb-3 text-lg font-semibold">
-          Client details
-        </h2>
-        <div className="mb-4 grid gap-2 text-sm font-bold">
+        <div className="mb-4 grid gap-2 text-sm font-semibold">
           <span>Client</span>
           <SearchSelect<Client>
             value={selectedClient}
             onChange={(option) => {
               setSelectedClient(option);
-              onClientChange(option?.value ?? "");
-              onClientStateChange(option?.data?.state ?? "");
+              onClientChange(option?.data ?? null);
             }}
             onSearch={searchClients}
             placeholder="Search client"
           />
         </div>
         {client && (
-          <div className="grid grid-cols-2 gap-4" aria-live="polite">
-            <div>
+          <div className="grid grid-cols-2 gap-4 text-sm" aria-live="polite">
+            <div className="min-w-0">
               <span className="mb-1 block text-sm text-slate-500">Address</span>
-              <strong>{client.address}</strong>
+              <span className="block break-words">{client.address ?? "Not provided"}</span>
             </div>
-            <div>
-              <span className="mb-1 block text-sm text-slate-500">GSTIN</span>
-              <strong>{client.gstNumber || "Not provided"}</strong>
+            <div className="min-w-0">
+              <span className="mb-1 block text-xs text-slate-500">GSTIN</span>
+              <span className="block break-words">{client.gstNumber || "Not provided"}</span>
             </div>
-            <div>
+            <div className="min-w-0">
               <span className="mb-1 block text-sm text-slate-500">Contact</span>
-              <strong>{client.contactDetails || "Not provided"}</strong>
+              <span className="block break-words">{client.contactDetails || "Not provided"}</span>
             </div>
-            <div>
+            <div className="min-w-0">
               <span className="mb-1 block text-sm text-slate-500">Email</span>
-              <strong>{client.email || "Not provided"}</strong>
+              <span className="block break-words">{client.email || "Not provided"}</span>
             </div>
           </div>
         )}
       </section>
-
       <section aria-labelledby="invoice-number-heading" className="mb-5">
-        <h2 id="invoice-number-heading" className="mb-3 text-lg font-semibold">
-          Invoice number
-        </h2>
-        <label className="mb-4 grid gap-2 text-sm font-bold">
+        <label className="mb-4 grid gap-2 text-sm font-semibold">
           Invoice number
           <input
             className="rounded-xl border border-slate-200 bg-white p-3 font-normal"
-            defaultValue={
-              invoice?.invoiceNumber ??
-              `${organization.invoiceNumberPrefix}${String(organization.invoiceNumberCurrentSeq + 1).padStart(4, "0")}`
-            }
+            value={invoice?.invoiceNumber ?? invoiceNumber}
             disabled
             required
           />
@@ -141,27 +102,17 @@ export function InvoiceFormClientDetails({
       </section>
 
       <section aria-labelledby="gst-heading" className="mb-5">
-        <h2 id="gst-heading" className="mb-3 text-lg font-semibold">
-          Invoice tax
-        </h2>
-        <label className="mb-4 grid gap-2 text-sm font-bold">
-          <span className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={gst}
-              onChange={(event) => onGstChange(event.target.checked)}
-            />
-            This is a GST invoice
+        <label className="mb-4 grid gap-2 text-sm font-semibold">
+          <span className="flex cursor-pointer items-center gap-2 cursor-pointer">
+            <Checkbox checked={gst} onChange={onGstChange} />
+            Mark as GST Invoice
           </span>
         </label>
       </section>
 
       <section aria-labelledby="invoice-dates-heading" className="mb-5">
-        <h2 id="invoice-dates-heading" className="mb-3 text-lg font-semibold">
-          Invoice dates
-        </h2>
         <div className="grid grid-cols-2 items-start gap-3">
-          <label className="mb-4 grid gap-2 text-sm font-bold">
+          <label className="mb-4 grid gap-2 text-sm font-semibold">
             Issue date
             <input
               className="rounded-xl border border-slate-200 bg-white p-3 font-normal"
@@ -172,7 +123,7 @@ export function InvoiceFormClientDetails({
             />
           </label>
           <div>
-            <label className="mb-4 grid gap-2 text-sm font-bold">
+            <label className="mb-2 grid gap-2 text-sm font-semibold">
               Due date
               <input
                 className="rounded-xl border border-slate-200 bg-white p-3 font-normal"
@@ -183,24 +134,17 @@ export function InvoiceFormClientDetails({
                 required
               />
             </label>
-            <div className="text-right text-slate-500">
-              Defaults to two months after the issue date.
+            <div className="text-right text-xs text-slate-500">
+              Defaults to three months after the issue date.
             </div>
           </div>
         </div>
       </section>
 
       <section aria-labelledby="signature-heading" className="mb-5">
-        <h2 id="signature-heading" className="mb-3 text-lg font-semibold">
-          Signature
-        </h2>
-        <label className="mb-4 grid gap-2 text-sm font-bold">
-          <span className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={includeSignature}
-              onChange={(event) => setIncludeSignature(event.target.checked)}
-            />
+        <label className="mb-4 grid gap-2 text-sm font-semibold">
+          <span className="flex cursor-pointer items-center gap-2">
+            <Checkbox checked={includeSignature} onChange={setIncludeSignature} />
             Add signature to invoice
           </span>
         </label>

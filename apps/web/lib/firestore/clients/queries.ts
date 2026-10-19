@@ -48,7 +48,6 @@ export async function addClient(orgId: string = "n4u3mv4HPuAhPxs3Dot7", client: 
   if (alreadyExists) {
     throw new Error("A client with this organization name already exists.");
   }
-  console.log("Added new client: ",client);
   return createClient(orgId, { ...client, clientName: client.clientName.trim() });
 }
 

@@ -7,6 +7,7 @@
   "exports": {
     ".": "./components/nav-bar/index.tsx",
     "./button": "./components/button/index.tsx",
+    "./checkbox": "./components/checkbox/index.tsx",
     "./avatar": "./components/avatar/index.tsx",
     "./chip": "./components/chip/index.tsx",
     "./dropdown": "./components/dropdown/index.tsx",

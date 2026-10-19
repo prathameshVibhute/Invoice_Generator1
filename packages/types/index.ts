@@ -36,22 +36,44 @@ export const clientSchema = z.object({
 });
 export type Client = z.infer<typeof clientSchema>;
 
-export const invoiceSchema = z.object({
-  id: z.string(),
+export const invoiceClientDetailsSchema = z.object({
+  clientName: z.string(),
+  address: z.string(),
+  contactDetails: z.string(),
+  email: z.string(),
+  gstNumber: z.string().nullable(),
+  state: z.string(),
+  country: z.string(),
+});
+export type InvoiceClientDetails = z.infer<typeof invoiceClientDetailsSchema>;
+
+export const invoicePayloadSchema = z.object({
   orgId: z.string(),
-  clientId: z.string(),
   invoiceNumber: z.string(),
-  status: invoiceStatusSchema,
+  issueDate: z.string(),
+  dueDate: z.string(),
+  clientId: z.string(),
+  clientDetails: invoiceClientDetailsSchema,
   isGstInvoice: z.boolean(),
   gstSplitType: z.enum(["none", "cgst_sgst", "igst"]),
-  amountPaid: z.number(),
+  items: z.array(invoiceItemSchema),
   subtotal: z.number(),
+  gst: z.number(),
+  cgst: z.number().nullable(),
+  sgst: z.number().nullable(),
+  igst: z.number().nullable(),
   total: z.number(),
+});
+export type InvoicePayload = z.infer<typeof invoicePayloadSchema>;
+
+export const invoiceSchema = invoicePayloadSchema.extend({
+  id: z.string(),
+  status: invoiceStatusSchema,
+  amountPaid: z.number(),
   signatureUrl: z.string().nullable(),
   isDeleted: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  items: z.array(invoiceItemSchema),
 });
 export type Invoice = z.infer<typeof invoiceSchema>;
 export const organizationSchema = z.object({
@@ -64,8 +86,13 @@ export const organizationSchema = z.object({
   logoUrl: z.string().nullable(),
   signatureUrl: z.string().nullable(),
   contactDetails: z.string(),
-  invoiceNumberPrefix: z.string(),
-  invoiceNumberCurrentSeq: z.number(),
+  invoicePrefix: z.string(),
+  invoiceCount: z.number(),
+  invoiceCountDetails: z
+    .object({
+      unpaidInvoiceCount: z.number(),
+    })
+    .optional(),
   bankDetails: z.string(),
   createdAt: z.string(),
 });

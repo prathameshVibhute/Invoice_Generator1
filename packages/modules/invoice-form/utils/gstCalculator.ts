@@ -1,5 +1,53 @@
 import type { Invoice, InvoiceItem } from "@invoice-generator/types";
 
+export function isSameState(organizationState: string, clientState: string): boolean {
+  const normalizedOrganizationState = organizationState.trim().toLocaleLowerCase();
+  const normalizedClientState = clientState.trim().toLocaleLowerCase();
+
+  return (
+    normalizedOrganizationState !== "" &&
+    normalizedClientState !== "" &&
+    normalizedOrganizationState === normalizedClientState
+  );
+}
+
+export function getGstBreakdown(
+  items: Pick<InvoiceItem, "quantity" | "rate" | "gstPercentage">[],
+  isGstInvoice: boolean,
+  isIntraState: boolean,
+): Array<{ label: string; amount: number }> {
+  const taxableByRate = new Map<number, number>();
+  for (const item of items) {
+    const rate = item.gstPercentage ?? 0;
+    taxableByRate.set(rate, (taxableByRate.get(rate) ?? 0) + getItemSubtotal(item));
+  }
+
+  const breakdown = [...taxableByRate.entries()]
+    .filter(([rate]) => rate > 0)
+    .sort(([firstRate], [secondRate]) => firstRate - secondRate)
+    .flatMap(([rate, taxableAmount]) => {
+      const taxAmount = isGstInvoice ? taxableAmount * (rate / 100) : 0;
+
+      if (!isIntraState) {
+        return [{ label: `IGST ${rate}%`, amount: taxAmount }];
+      }
+
+      return [
+        { label: `CGST ${rate / 2}%`, amount: taxAmount / 2 },
+        { label: `SGST ${rate / 2}%`, amount: taxAmount / 2 },
+      ];
+    });
+
+  if (breakdown.length > 0) return breakdown;
+
+  return isIntraState
+    ? [
+        { label: "CGST", amount: 0 },
+        { label: "SGST", amount: 0 },
+      ]
+    : [{ label: "IGST", amount: 0 }];
+}
+
 export function getItemSubtotal(item: Pick<InvoiceItem, "quantity" | "rate">): number {
   return item.quantity * item.rate;
 }

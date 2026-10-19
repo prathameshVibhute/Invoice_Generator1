@@ -46,7 +46,7 @@ export function Button({
   );
 
   return (
-    <button {...buttonProps} type={type} onClick={onButtonClick} className={className}>
+    <button {...buttonProps} type={type} onClick={onButtonClick} className={className + " cursor-pointer"}>
       {Icon && (
         <Icon
           className={`h-5 w-5 ${iconClassName ? ` ${iconClassName}` : ""}`}

@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconCopyPlus, IconTrash } from "@tabler/icons-react";
 import type { InvoiceItem } from "@invoice-generator/types";
 import { Button } from "@invoice-generator/ui/button";
-import { money, organization } from "../../data";
+import { Dropdown } from "@invoice-generator/ui/dropdown";
+import { money } from "../../data";
+import { getGstBreakdown, isSameState } from "../utils/gstCalculator";
 
 interface InvoiceFormItemDetailsProps {
   items: InvoiceItem[];
   onItemsChange: (items: InvoiceItem[]) => void;
   gst: boolean;
+  organizationState: string;
   clientState?: string;
   onClientDetails: () => void;
   onPreviewInvoice: () => void;
@@ -47,6 +50,7 @@ export function InvoiceFormItemDetails({
   items,
   onItemsChange,
   gst,
+  organizationState,
   clientState,
   onClientDetails,
   onPreviewInvoice,
@@ -56,6 +60,8 @@ export function InvoiceFormItemDetails({
 
   const subtotal = items.reduce((total, item) => total + getItemSubtotal(item), 0);
   const gstTotal = items.reduce((total, item) => total + getItemTax(item, gst), 0);
+  const isIntraState = isSameState(organizationState, clientState ?? "");
+  const gstBreakdown = getGstBreakdown(items, gst, isIntraState);
   const quantity = Number(draft.quantity);
   const rate = Number(draft.rate);
   const draftTax =
@@ -104,7 +110,7 @@ export function InvoiceFormItemDetails({
   function renderEditor() {
     return (
       <div className="p-0">
-        <label className="mb-4 grid gap-2 text-sm font-bold">
+        <label className="mb-4 grid gap-2 text-sm font-semibold">
           Item description
           <input
             className="rounded-xl border border-slate-200 bg-white p-3 font-normal"
@@ -116,7 +122,7 @@ export function InvoiceFormItemDetails({
           />
         </label>
         <div className="grid grid-cols-2 gap-3">
-          <label className="mb-4 grid gap-2 text-sm font-bold">
+          <label className="mb-4 grid gap-2 text-sm font-semibold">
             Quantity
             <input
               className="rounded-xl border border-slate-200 bg-white p-3 font-normal"
@@ -128,7 +134,7 @@ export function InvoiceFormItemDetails({
               required
             />
           </label>
-          <label className="mb-4 grid gap-2 text-sm font-bold">
+          <label className="mb-4 grid gap-2 text-sm font-semibold">
             Unit price
             <input
               className="rounded-xl border border-slate-200 bg-white p-3 font-normal"
@@ -141,22 +147,20 @@ export function InvoiceFormItemDetails({
               required
             />
           </label>
-          <label className="mb-4 grid gap-2 text-sm font-bold">
-            GST
-            <select
-              className="rounded-xl border border-slate-200 bg-white p-3 font-normal"
+          <label className="mb-4 grid gap-2 text-sm font-semibold">
+            {isIntraState ? "CGST + SGST" : "IGST"}
+            <Dropdown
+              options={gstRates.map((value) => ({
+                id: String(value),
+                label: `${value}%`,
+                value: String(value),
+              }))}
               value={draft.gstPercentage}
               disabled={!gst}
-              onChange={(event) => setDraft({ ...draft, gstPercentage: event.target.value })}
-            >
-              {gstRates.map((value) => (
-                <option key={value} value={value}>
-                  {value}%
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setDraft({ ...draft, gstPercentage: value })}
+            />
           </label>
-          <label className="mb-4 grid gap-2 text-sm font-bold">
+          <label className="mb-4 grid gap-2 text-sm font-semibold">
             Total
             <input
               className="rounded-xl border border-slate-200 bg-slate-50 p-3 font-normal"
@@ -166,9 +170,9 @@ export function InvoiceFormItemDetails({
             />
           </label>
         </div>
-        <div className="flex justify-end">
+        <div className="flex w-full">
           <Button
-            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-45"
+            className="w-full items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-3 font-regular text-white disabled:cursor-not-allowed disabled:opacity-45"
             type="button"
             onClick={saveItem}
             disabled={!canSave}
@@ -182,7 +186,7 @@ export function InvoiceFormItemDetails({
 
   return (
     <section aria-labelledby="items-heading">
-      <h2 id="items-heading" className="mb-3 text-lg font-semibold">
+      <h2 id="items-heading" className="mb-3 text-sm font-semibold">
         Line items
       </h2>
       {items.length > 0 && (
@@ -195,41 +199,49 @@ export function InvoiceFormItemDetails({
                   renderEditor()
                 ) : (
                   <>
-                    <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-start gap-3 max-[480px]:grid-cols-[minmax(0,1fr)_auto]">
+                    <div className="grid">
                       <div className="grid gap-2">
-                        <strong>{item.itemName}</strong>
-                        <span className="text-slate-500">
-                          {item.quantity} × {money(item.rate)}
-                        </span>
-                        {gst && (
-                          <span className="text-sm text-slate-500">
-                            {(item.gstPercentage ?? 0) === 0
-                              ? "No GST (0%)"
-                              : clientState === organization.state
-                                ? `CGST ${(item.gstPercentage ?? 0) / 2}% + SGST ${(item.gstPercentage ?? 0) / 2}%`
-                                : `IGST ${item.gstPercentage}%`}
-                          </span>
-                        )}
+                        <div className="flex flex-row w-full justify-between items-center">
+                          <span className="text-lg font-medium">{item.itemName}</span>
+                          <div className="flex flex-row items-center gap-2 justify-end">
+                            <span>{money(itemTotal)}</span>
+                            <div className="flex gap-2 max-[480px]:col-start-2 max-[480px]:row-start-2">
+                              <Button
+                                className="grid h-[38px] w-[38px] place-items-center rounded-xl bg-slate-100 p-0 text-slate-500"
+                                type="button"
+                                aria-label={`Edit ${item.itemName}`}
+                                title="Edit item"
+                                onClick={() => openEditItemForm(item)}
+                              >
+                                <IconEdit aria-hidden="true" className="w-5 h-5" />
+                              </Button>
+                              <Button
+                                className="grid h-[38px] w-[38px] place-items-center rounded-xl bg-red-50 p-0 text-red-600"
+                                type="button"
+                                aria-label={`Delete ${item.itemName}`}
+                                title="Delete is not available yet"
+                              >
+                                <IconTrash aria-hidden="true" className="w-5 h-5" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <div className="text-slate-500">
+                            <span>{item.quantity} × {money(item.rate)}</span>
+                          </div>
+                          {gst && (
+                            <span className="text-slate-500">
+                              {(item.gstPercentage ?? 0) === 0
+                                ? "No GST (0%)"
+                                : isIntraState
+                                  ? `CGST ${(item.gstPercentage ?? 0) / 2}% + SGST ${(item.gstPercentage ?? 0) / 2}%`
+                                  : `IGST ${item.gstPercentage}%`}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <strong className="pt-0.5 whitespace-nowrap">{money(itemTotal)}</strong>
-                      <div className="flex gap-2 max-[480px]:col-start-2 max-[480px]:row-start-2">
-                        <Button
-                          className="grid h-[38px] w-[38px] place-items-center rounded-full bg-slate-100 p-0 text-slate-500"
-                          type="button"
-                          aria-label={`Edit ${item.itemName}`}
-                          title="Edit item"
-                          onClick={() => openEditItemForm(item)}
-                        >
-                          <IconEdit aria-hidden="true" className="w-5 h-5" />
-                        </Button>
-                        <Button
-                          className="grid h-[38px] w-[38px] place-items-center rounded-full bg-red-50 p-0 text-red-600"
-                          type="button"
-                          aria-label={`Delete ${item.itemName}`}
-                          title="Delete is not available yet"
-                        >
-                          <IconTrash aria-hidden="true" className="w-5 h-5" />
-                        </Button>
+                      <div className="pt-0.5 whitespace-nowrap">
                       </div>
                     </div>
                   </>
@@ -250,42 +262,42 @@ export function InvoiceFormItemDetails({
       )}
 
       <Button
-        className="mt-[18px] flex min-h-[68px] w-full items-center justify-center gap-2.5 rounded-2xl border border-dashed border-slate-300 bg-transparent font-bold text-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-[18px] flex min-h-[68px] w-full items-center justify-center gap-2.5 rounded-2xl border border-dashed border-slate-300 bg-transparent font-semibold text-blue-600 disabled:cursor-not-allowed disabled:opacity-60 text-sm"
         type="button"
         onClick={openNewItemForm}
         disabled={editingItemId !== null}
       >
-        <IconPlus aria-hidden="true" className="w-5 h-5" />
+        <IconCopyPlus aria-hidden="true" className="w-5 h-5" />
         Add item
       </Button>
 
-      <div className="mt-[18px] grid gap-3.5 rounded-2xl border border-slate-200 bg-white px-[22px] py-5">
-        <div>
-          <span>Subtotal</span>
+      <div className="mt-[18px] grid gap-3.5 rounded-2xl border border-slate-200 bg-white px-[22px] py-5 text-sm">
+        <div className="flex justify-between gap-3">
+          <span>Sub Total</span>
           <span>{money(subtotal)}</span>
         </div>
-        {gst && (
-          <div>
-            <span>GST</span>
-            <span>{money(gstTotal)}</span>
+        {gstBreakdown.map(({ label, amount }) => (
+          <div className="flex justify-between gap-3" key={label}>
+            <span>{label}</span>
+            <span>{money(amount)}</span>
           </div>
-        )}
-        <div className="border-t border-slate-200 pt-3.5 text-lg">
-          <strong>Total</strong>
-          <strong>{money(subtotal + gstTotal)}</strong>
+        ))}
+        <div className="border-t flex justify-between border-slate-200 pt-3.5 text-lg">
+          <span>Total</span>
+          <span>{money(subtotal + gstTotal)}</span>
         </div>
       </div>
 
       <div className="mt-5 flex justify-between gap-3">
         <Button
-          className="inline-flex items-center justify-center rounded-xl border border-blue-600 bg-white px-3.5 py-3 font-bold text-blue-600"
+          className="inline-flex items-center justify-center rounded-xl border border-blue-600 bg-white px-3.5 py-3 font-regular text-blue-600"
           type="button"
           onClick={onClientDetails}
         >
           Client details
         </Button>
         <Button
-          className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3.5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3.5 py-3 font-regular text-white disabled:cursor-not-allowed disabled:opacity-60"
           type="button"
           onClick={onPreviewInvoice}
           disabled={items.length === 0 || editingItemId !== null}
