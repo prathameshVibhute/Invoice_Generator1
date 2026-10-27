@@ -1,6 +1,5 @@
-import Link from "next/link";
-import type { Invoice, InvoiceStatus } from "@invoice-generator/types";
-import { getClient, money } from "./data";
+import type { InvoiceStatus } from "@invoice-generator/types";
+
 export function StatusChip({ status }: { status: InvoiceStatus }) {
   const statusClasses: Record<InvoiceStatus, string> = {
     paid: "bg-emerald-100 text-emerald-700",
@@ -17,40 +16,7 @@ export function StatusChip({ status }: { status: InvoiceStatus }) {
     </span>
   );
 }
-export function InvoiceCard({ invoice }: { invoice: Invoice }) {
-  const client = getClient(invoice.clientId);
-  return (
-    <Link
-      className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-      href={`/invoices/${invoice.id}`}
-    >
-      <div className="flex items-start justify-between gap-2.5">
-        <div className="min-w-0 flex-1">
-          <div className="truncate font-bold">{invoice.invoiceNumber}</div>
-          <div className="text-sm text-slate-500">
-            {new Date(invoice.createdAt).toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })}
-          </div>
-        </div>
-        <StatusChip status={invoice.status} />
-      </div>
-      <div className="mt-3.5 flex min-w-0 items-start justify-between gap-2.5">
-        <div className="min-w-0 flex-1">
-          <strong className="block truncate">{client.clientName}</strong>
-          <div className="truncate text-sm text-slate-500">
-            {invoice.isGstInvoice ? (client.gstNumber ?? "GST invoice") : "Non-GST invoice"}
-          </div>
-        </div>
-        <strong className="block max-w-[45%] shrink-0 break-words text-right">
-          {money(invoice.total)}
-        </strong>
-      </div>
-    </Link>
-  );
-}
+
 export function Calendar() {
   const days = ["S", "M", "T", "W", "T", "F", "S"];
   return (

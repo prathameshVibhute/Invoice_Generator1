@@ -2,10 +2,15 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import type { Client, Invoice, InvoicePayload, Organization } from "@invoice-generator/types";
+import type {
+  Client,
+  Invoice,
+  InvoicePayload,
+  InvoiceWithClientDetails,
+  Organization,
+} from "@invoice-generator/types";
 import { Stepper, type StepperStep } from "@invoice-generator/ui/stepper";
 import { Button } from "@invoice-generator/ui/button";
-import { clients, invoices } from "../data";
 import { InvoiceFormClientDetails } from "./components/invoice-form-client-details";
 import { InvoiceFormHeader } from "./components/invoice-form-header";
 import { InvoiceFormItemDetails } from "./components/invoice-form-item-details";
@@ -14,34 +19,40 @@ import { calculateInvoiceTotals, isSameState } from "./utils/gstCalculator";
 import { getDefaultInvoiceDates } from "./utils/invoiceDates";
 
 export function InvoiceFormScreen({
-  id,
+  invoice,
+  initialClient,
   organization,
   getClientsAction,
   createInvoiceAction,
+  updateInvoiceAction,
 }: {
-  id?: string;
+  invoice?: InvoiceWithClientDetails;
+  initialClient?: Client | null;
   organization: Organization;
   getClientsAction: (clientName: string) => Promise<Client[]>;
   createInvoiceAction?: (invoice: InvoicePayload) => Promise<Invoice>;
+  updateInvoiceAction?: (invoiceId: string, invoice: InvoicePayload) => Promise<void>;
 }) {
   const router = useRouter();
-  const existing = id ? invoices.find((invoice) => invoice.id === id) : undefined;
-  const [gst, setGst] = useState(existing?.isGstInvoice ?? true);
-  const [items, setItems] = useState(existing?.items ?? []);
-  const initialClient = clients.find((entry) => entry.id === existing?.clientId) ?? null;
-  const [selectedClient, setSelectedClient] = useState<Client | null>(initialClient);
-  const [{ issueDate, dueDate }] = useState(getDefaultInvoiceDates);
+  const [gst, setGst] = useState(invoice?.isGstInvoice ?? true);
+  const [items, setItems] = useState(invoice?.items ?? []);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(initialClient ?? null);
+  const [defaultDates] = useState(getDefaultInvoiceDates);
+  const [issueDate, setIssueDate] = useState(invoice?.issueDate ?? defaultDates.issueDate);
+  const [dueDate, setDueDate] = useState(invoice?.dueDate ?? defaultDates.dueDate);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const clientState = selectedClient?.state ?? "";
   const invoiceNumber =
-    existing?.invoiceNumber ?? `${organization?.invoicePrefix}${organization?.invoiceCount}`;
+    invoice?.invoiceNumber ?? `${organization.invoicePrefix}${organization.invoiceCount}`;
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const title = existing ? "Edit invoice" : "New invoice";
+  const title = invoice ? "Edit invoice" : "New invoice";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!selectedClient) {
-      console.error("Cannot create an invoice without a selected client.");
+      setSubmitError("Select a client before saving the invoice.");
       return;
     }
 
@@ -51,34 +62,41 @@ export function InvoiceFormScreen({
         ? "cgst_sgst"
         : "igst";
     const totals = calculateInvoiceTotals({ items, isGstInvoice: gst, gstSplitType });
-    const invoice = {
+    const invoicePayload = {
       orgId: organization.id,
       invoiceNumber,
       issueDate,
       dueDate,
       clientId: selectedClient.id,
-      clientDetails: {
-        clientName: selectedClient.clientName,
-        address: selectedClient.address,
-        contactDetails: selectedClient.contactDetails,
-        email: selectedClient.email,
-        gstNumber: selectedClient.gstNumber,
-        state: selectedClient.state,
-        country: selectedClient.country,
-      },
+      clientName: selectedClient.clientName,
+      gstNumber: selectedClient.gstNumber || "",
       isGstInvoice: gst,
       gstSplitType,
       items,
       ...totals,
     } satisfies InvoicePayload;
 
-    if (!existing && createInvoiceAction) {
-      await createInvoiceAction(invoice);
-      router.push("/invoices");
-      return;
+    try {
+      setSubmitError(null);
+      setIsSubmitting(true);
+      if (invoice) {
+        if (!updateInvoiceAction) {
+          throw new Error("Invoice update is not available.");
+        }
+        await updateInvoiceAction(invoice.id, invoicePayload);
+        router.push(`/invoices/${invoice.id}`);
+      } else {
+        if (!createInvoiceAction) {
+          throw new Error("Invoice creation is not available.");
+        }
+        await createInvoiceAction(invoicePayload);
+        router.push("/invoices");
+      }
+    } catch (error) {
+      console.error("Unable to save invoice.", error);
+      setSubmitError(error instanceof Error ? error.message : "Unable to save invoice.");
+      setIsSubmitting(false);
     }
-
-    console.log("Invoice payload:", invoice);
   }
 
   const steps: StepperStep[] = [
@@ -87,12 +105,14 @@ export function InvoiceFormScreen({
       content: ({ onNext }) => (
         <>
           <InvoiceFormClientDetails
-            {...(existing ? { invoice: existing } : {})}
-            initialClient={initialClient}
+            {...(invoice ? { invoice } : {})}
+            initialClient={initialClient ?? null}
             organization={organization}
             invoiceNumber={invoiceNumber}
             issueDate={issueDate}
             dueDate={dueDate}
+            onIssueDateChange={setIssueDate}
+            onDueDateChange={setDueDate}
             onClientChange={setSelectedClient}
             gst={gst}
             onGstChange={setGst}
@@ -150,8 +170,9 @@ export function InvoiceFormScreen({
             <Button
               className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-3.5 py-3 font-regular text-white"
               type="submit"
+              disabled={isSubmitting}
             >
-              {existing ? "Update invoice" : "Create invoice"}
+              {isSubmitting ? "Saving…" : invoice ? "Update invoice" : "Create invoice"}
             </Button>
           </div>
         </>
@@ -161,8 +182,13 @@ export function InvoiceFormScreen({
 
   return (
     <>
-      <InvoiceFormHeader title={title} {...(existing ? { id: existing.id } : {})} />
+      <InvoiceFormHeader title={title} {...(invoice ? { id: invoice.id } : {})} />
       <form onSubmit={handleSubmit}>
+        {submitError ? (
+          <p role="alert" className="mb-4 text-sm text-red-600">
+            {submitError}
+          </p>
+        ) : null}
         <Stepper
           steps={steps}
           currentStepIndex={currentStepIndex}

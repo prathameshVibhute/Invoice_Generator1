@@ -1,12 +1,12 @@
-import type { Client, Invoice, Organization } from "@invoice-generator/types";
+import type { InvoiceWithClientDetails, Organization } from "@invoice-generator/types";
 import type { InvoicePdfData } from "@invoice-generator/types/invoicePdf";
 import { calculateInvoiceTotals } from "../../invoice-form/utils/gstCalculator";
 
 export type InvoicePdfBuilderInput = {
-  invoice: Invoice;
+  invoice: InvoiceWithClientDetails;
   organization: Organization;
-  client: Client;
   logoDataUrl: string | null;
+  stampDataUrl: string | null;
   signatureDataUrl: string | null;
   labels?: Record<string, string>;
 };
@@ -16,7 +16,8 @@ const defaultLabels: Record<string, string> = {
   billTo: "Bill To",
   invoiceNumber: "Invoice No.",
   invoiceDate: "Date",
-  subtotal: "Subtotal",
+  placeOfSupply: "Place of Supply",
+  subtotal: "Subtotal (excl. GST)",
   total: "Total",
   hsnSac: "HSN/SAC",
   qty: "Qty",
@@ -24,9 +25,7 @@ const defaultLabels: Record<string, string> = {
   gstPercent: "GST %",
   item: "Item",
   amount: "Amount",
-  page: "Page",
-  of: "of",
-  contact: "Contact",
+  contact: "Phone",
   email: "Email",
   gstNumber: "GST No.",
   state: "State",
@@ -35,6 +34,9 @@ const defaultLabels: Record<string, string> = {
   cgst: "CGST",
   sgst: "SGST",
   igst: "IGST",
+  intraStateSupply: "Intra-state supply: CGST + SGST",
+  interStateSupply: "Inter-state supply: IGST",
+  authorisedSignatory: "Authorised Signatory",
 };
 
 const moneyFormatter = new Intl.NumberFormat("en-IN", {
@@ -43,10 +45,11 @@ const moneyFormatter = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 2,
 });
 
-const dateFormatter = new Intl.DateTimeFormat("en-IN", {
+const dateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "2-digit",
-  month: "short",
+  month: "2-digit",
   year: "numeric",
+  timeZone: "UTC",
 });
 
 function formatCurrency(value: number): string {
@@ -54,7 +57,7 @@ function formatCurrency(value: number): string {
 }
 
 function formatDate(value: string): string {
-  const date = new Date(`${value}T00:00:00`);
+  const date = new Date(value);
   return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date);
 }
 
@@ -69,19 +72,52 @@ function buildAddress(...parts: Array<string | null | undefined>): string {
 export function buildInvoicePdfData({
   invoice,
   organization,
-  client,
   logoDataUrl,
+  stampDataUrl,
   signatureDataUrl,
   labels,
 }: InvoicePdfBuilderInput): InvoicePdfData {
+  const client = invoice.clientDetails;
   const pdfLabels = { ...defaultLabels, ...(labels ?? {}) };
   const totals = calculateInvoiceTotals(invoice);
+  const taxableByRate = new Map<number, number>();
+  if (invoice.isGstInvoice) {
+    for (const item of invoice.items) {
+      const rate = item.gstPercentage ?? 0;
+      if (rate > 0) {
+        taxableByRate.set(rate, (taxableByRate.get(rate) ?? 0) + item.quantity * item.rate);
+      }
+    }
+  }
+  const taxBreakdown: InvoicePdfData["taxBreakdown"] = [];
+  for (const [rate, taxableAmount] of [...taxableByRate.entries()].sort(
+    ([firstRate], [secondRate]) => firstRate - secondRate,
+  )) {
+    if (invoice.gstSplitType === "cgst_sgst") {
+      for (const taxType of ["CGST", "SGST"] as const) {
+        taxBreakdown.push({
+          taxType,
+          rate: rate / 2,
+          taxableAmount: formatCurrency(taxableAmount),
+          amount: formatCurrency((taxableAmount * rate) / 200),
+        });
+      }
+    } else if (invoice.gstSplitType === "igst") {
+      taxBreakdown.push({
+        taxType: "IGST",
+        rate,
+        taxableAmount: formatCurrency(taxableAmount),
+        amount: formatCurrency((taxableAmount * rate) / 100),
+      });
+    }
+  }
 
   return {
     invoiceNumber: invoice.invoiceNumber,
     invoiceDate: formatDate(invoice.createdAt),
     isGstInvoice: invoice.isGstInvoice,
     gstSplitType: invoice.gstSplitType,
+    placeOfSupply: client.state,
     organization: {
       name: organization.name,
       address: buildAddress(organization.address, organization.state, organization.country),
@@ -89,7 +125,9 @@ export function buildInvoicePdfData({
       country: organization.country,
       gstNo: organization.gstNumber,
       contactDetails: compactValue(organization.contactDetails),
+      email: compactValue(organization.email),
       logoDataUrl,
+      stampDataUrl,
       signatureDataUrl,
     },
     client: {
@@ -104,13 +142,15 @@ export function buildInvoicePdfData({
     items: invoice.items.map((item, index) => ({
       serialNo: index + 1,
       itemName: item.itemName,
+      description: item.description?.trim() ?? "",
       hsnSacCode: "-",
       quantity: String(item.quantity),
       rate: formatCurrency(item.rate),
       gstPercentage:
         item.gstPercentage == null || !invoice.isGstInvoice ? null : `${item.gstPercentage}%`,
-      total: formatCurrency(item.total),
+      total: formatCurrency(item.quantity * item.rate),
     })),
+    taxBreakdown,
     totals: {
       subtotal: formatCurrency(totals.subtotal),
       cgst:

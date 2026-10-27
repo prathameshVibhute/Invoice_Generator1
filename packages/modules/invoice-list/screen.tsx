@@ -2,15 +2,22 @@
 import { useState } from "react";
 import Link from "next/link";
 import { IconPlus, IconSettings } from "@tabler/icons-react";
-import { invoices } from "../data";
-import { Calendar, InvoiceCard } from "../shared";
+import type { InvoiceWithClientDetails } from "@invoice-generator/types";
+import { InvoiceCard } from "./components/invoice-card";
 import { Button } from "@invoice-generator/ui/button";
+import { Tabs } from "@invoice-generator/ui/tabs";
 
-export function InvoiceListScreen() {
-  const [tab, setTab] = useState("all");
+export function InvoiceListScreen({
+  invoices,
+  organizationName,
+}: {
+  invoices: InvoiceWithClientDetails[];
+  organizationName: string;
+}) {
+  const [tab, setTab] = useState("All");
   const listed = invoices.filter((invoice) =>
-    tab === "all" || tab === "paid"
-      ? tab === "all" || invoice.status === "paid"
+    tab === "All" || tab === "Paid"
+      ? tab === "All" || invoice.status === "paid"
       : invoice.status !== "paid",
   );
   return (
@@ -19,7 +26,7 @@ export function InvoiceListScreen() {
         <div>
           <h1 className="text-2xl font-bold">Invoices</h1>
           <div className="text-xs text-slate-500">
-            Acme Studio · <Link href="/organization">Settings</Link>
+            {organizationName} · <Link href="/organization">Settings</Link>
           </div>
         </div>
         <div className="flex gap-2.5">
@@ -40,7 +47,6 @@ export function InvoiceListScreen() {
           />
         </div>
       </header>
-      <Calendar />
       <section className="my-4 grid grid-cols-3 gap-2.5">
         <div className="rounded-2xl border border-slate-200 bg-white p-3">
           <strong className="mb-1 block text-xl">{invoices.length}</strong>
@@ -59,22 +65,15 @@ export function InvoiceListScreen() {
           <span className="text-slate-500">Unpaid</span>
         </div>
       </section>
-      <div className="mb-4 flex gap-5 border-b border-slate-200">
-        {["all", "paid", "unpaid"].map((name) => (
-          <Button
-            onClick={() => setTab(name)}
-            className={`border-0 border-b-2 bg-transparent px-0.5 py-3 font-bold ${tab === name ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500"}`}
-            key={name}
-            type="button"
-          >
-            {name[0]!.toUpperCase() + name.slice(1)}
-          </Button>
-        ))}
-      </div>
+      <Tabs labels={["All", "Paid", "Unpaid"]} currentTab={tab} onTabChange={setTab} />
       <div className="grid gap-3">
-        {listed.map((invoice) => (
-          <InvoiceCard key={invoice.id} invoice={invoice} />
-        ))}
+        {listed.length > 0 ? (
+          listed.map((invoice) => <InvoiceCard key={invoice.id} invoice={invoice} />)
+        ) : (
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
+            {tab === "All" ? "No invoices found." : `No ${tab.toLowerCase()} invoices found.`}
+          </div>
+        )}
       </div>
     </>
   );

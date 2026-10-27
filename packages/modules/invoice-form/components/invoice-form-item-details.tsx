@@ -20,6 +20,7 @@ interface InvoiceFormItemDetailsProps {
 
 interface ItemDraft {
   itemName: string;
+  description: string;
   quantity: string;
   rate: string;
   gstPercentage: string;
@@ -39,11 +40,18 @@ function toDraft(item?: InvoiceItem, gst = true): ItemDraft {
   return item
     ? {
         itemName: item.itemName,
+        description: item.description ?? "",
         quantity: String(item.quantity),
         rate: String(item.rate),
         gstPercentage: String(item.gstPercentage ?? 0),
       }
-    : { itemName: "", quantity: "1", rate: "", gstPercentage: gst ? "18" : "0" };
+    : {
+        itemName: "",
+        description: "",
+        quantity: "1",
+        rate: "",
+        gstPercentage: gst ? "18" : "0",
+      };
 }
 
 export function InvoiceFormItemDetails({
@@ -93,6 +101,7 @@ export function InvoiceFormItemDetails({
     const item: InvoiceItem = {
       id: editingItemId === "new" ? crypto.randomUUID() : editingItemId,
       itemName: draft.itemName.trim(),
+      description: draft.description.trim(),
       quantity,
       rate,
       gstPercentage: Number(draft.gstPercentage),
@@ -111,7 +120,7 @@ export function InvoiceFormItemDetails({
     return (
       <div className="p-0">
         <label className="mb-4 grid gap-2 text-sm font-semibold">
-          Item description
+          Item name
           <input
             className="rounded-xl border border-slate-200 bg-white p-3 font-normal"
             autoFocus
@@ -119,6 +128,16 @@ export function InvoiceFormItemDetails({
             onChange={(event) => setDraft({ ...draft, itemName: event.target.value })}
             placeholder="e.g. maintenance"
             required
+          />
+        </label>
+        <label className="mb-4 grid gap-2 text-sm font-semibold">
+          Description (optional)
+          <textarea
+            className="min-h-24 resize-y rounded-xl border border-slate-200 bg-white p-3 font-normal"
+            value={draft.description}
+            onChange={(event) => setDraft({ ...draft, description: event.target.value })}
+            placeholder="Add more details about this item"
+            rows={3}
           />
         </label>
         <div className="grid grid-cols-2 gap-3">
@@ -202,7 +221,14 @@ export function InvoiceFormItemDetails({
                     <div className="grid">
                       <div className="grid gap-2">
                         <div className="flex flex-row w-full justify-between items-center">
-                          <span className="text-lg font-medium">{item.itemName}</span>
+                          <div className="min-w-0">
+                            <span className="text-lg font-medium">{item.itemName}</span>
+                            {item.description?.trim() ? (
+                              <p className="mt-1 whitespace-pre-wrap text-sm text-slate-600">
+                                {item.description}
+                              </p>
+                            ) : null}
+                          </div>
                           <div className="flex flex-row items-center gap-2 justify-end">
                             <span>{money(itemTotal)}</span>
                             <div className="flex gap-2 max-[480px]:col-start-2 max-[480px]:row-start-2">
@@ -228,7 +254,9 @@ export function InvoiceFormItemDetails({
                         </div>
                         <div className="flex justify-between text-sm">
                           <div className="text-slate-500">
-                            <span>{item.quantity} × {money(item.rate)}</span>
+                            <span>
+                              {item.quantity} × {money(item.rate)}
+                            </span>
                           </div>
                           {gst && (
                             <span className="text-slate-500">
@@ -241,8 +269,7 @@ export function InvoiceFormItemDetails({
                           )}
                         </div>
                       </div>
-                      <div className="pt-0.5 whitespace-nowrap">
-                      </div>
+                      <div className="pt-0.5 whitespace-nowrap"></div>
                     </div>
                   </>
                 )}

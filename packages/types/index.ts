@@ -8,6 +8,7 @@ export type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;
 export const invoiceItemSchema = z.object({
   id: z.string(),
   itemName: z.string(),
+  description: z.string().optional(),
   quantity: z.number(),
   gstPercentage: z.number().nullable(),
   rate: z.number(),
@@ -53,7 +54,9 @@ export const invoicePayloadSchema = z.object({
   issueDate: z.string(),
   dueDate: z.string(),
   clientId: z.string(),
-  clientDetails: invoiceClientDetailsSchema,
+  clientDetails: invoiceClientDetailsSchema.optional(),
+  clientName: z.string(),
+  gstNumber: z.string(),
   isGstInvoice: z.boolean(),
   gstSplitType: z.enum(["none", "cgst_sgst", "igst"]),
   items: z.array(invoiceItemSchema),
@@ -76,6 +79,7 @@ export const invoiceSchema = invoicePayloadSchema.extend({
   updatedAt: z.string(),
 });
 export type Invoice = z.infer<typeof invoiceSchema>;
+export type InvoiceWithClientDetails = Invoice & { clientDetails: InvoiceClientDetails };
 export const organizationSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -85,6 +89,8 @@ export const organizationSchema = z.object({
   gstNumber: z.string().nullable(),
   logoUrl: z.string().nullable(),
   signatureUrl: z.string().nullable(),
+  stampUrl: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
   contactDetails: z.string(),
   invoicePrefix: z.string(),
   invoiceCount: z.number(),

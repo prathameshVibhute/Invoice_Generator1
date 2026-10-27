@@ -5,6 +5,7 @@ export type InvoicePdfData = {
   invoiceDate: string;
   isGstInvoice: boolean;
   gstSplitType: InvoicePdfGstSplitType;
+  placeOfSupply: string;
   organization: {
     name: string;
     address: string;
@@ -12,7 +13,9 @@ export type InvoicePdfData = {
     country: string;
     gstNo: string | null;
     contactDetails: string;
+    email: string;
     logoDataUrl: string | null;
+    stampDataUrl: string | null;
     signatureDataUrl: string | null;
   };
   client: {
@@ -27,11 +30,18 @@ export type InvoicePdfData = {
   items: Array<{
     serialNo: number;
     itemName: string;
+    description: string;
     hsnSacCode: string;
     quantity: string;
     rate: string;
     gstPercentage: string | null;
     total: string;
+  }>;
+  taxBreakdown: Array<{
+    taxType: "CGST" | "SGST" | "IGST";
+    rate: number;
+    taxableAmount: string;
+    amount: string;
   }>;
   totals: {
     subtotal: string;

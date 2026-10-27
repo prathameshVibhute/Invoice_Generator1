@@ -1,18 +1,30 @@
 import type { Client } from "@invoice-generator/types";
-import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 
 type NewClient = Omit<Client, "id" | "orgId" | "createdAt" | "isDeleted" | "pendingInvoiceCount">;
 type ClientUpdates = Partial<Omit<Client, "id" | "orgId" | "createdAt" | "isDeleted">>;
 
 /**
- * 
- * @param orgId 
- * @param clientId 
- * @returns 
+ *
+ * @param orgId
+ * @param clientId
+ * @returns
  */
 
-export async function getClientById(orgId: string = "n4u3mv4HPuAhPxs3Dot7", clientId: string): Promise<Client | null> {
+export async function getClientById(
+  orgId: string = "n4u3mv4HPuAhPxs3Dot7",
+  clientId: string,
+): Promise<Client | null> {
   const snapshot = await getDoc(doc(db, "invoice_generation_clients", clientId));
   if (!snapshot.exists()) return null;
 
@@ -20,7 +32,10 @@ export async function getClientById(orgId: string = "n4u3mv4HPuAhPxs3Dot7", clie
   return client.orgId === orgId && !client.isDeleted ? client : null;
 }
 
-export async function getClients(orgId: string = "n4u3mv4HPuAhPxs3Dot7", searchValue?: string): Promise<Client[]> {
+export async function getClients(
+  orgId: string = "n4u3mv4HPuAhPxs3Dot7",
+  searchValue?: string,
+): Promise<Client[]> {
   const normalizedSearch = searchValue?.trim().toLowerCase();
   const clientsQuery = query(
     collection(db, "invoice_generation_clients"),
@@ -38,7 +53,33 @@ export async function getClients(orgId: string = "n4u3mv4HPuAhPxs3Dot7", searchV
     .sort((first, second) => second.createdAt.localeCompare(first.createdAt));
 }
 
-export async function addClient(orgId: string = "n4u3mv4HPuAhPxs3Dot7", client: NewClient): Promise<Client> {
+export async function getInvoiceClients(orgId: string): Promise<Client[]> {
+  const clientsQuery = query(
+    collection(db, "invoice_generation_clients"),
+    where("orgId", "==", orgId),
+  );
+  const snapshot = await getDocs(clientsQuery);
+
+  return snapshot.docs.map(
+    (clientSnapshot) => ({ ...clientSnapshot.data(), id: clientSnapshot.id }) as Client,
+  );
+}
+
+export async function getInvoiceClientById(
+  orgId: string,
+  clientId: string,
+): Promise<Client | null> {
+  const snapshot = await getDoc(doc(db, "invoice_generation_clients", clientId));
+  if (!snapshot.exists()) return null;
+
+  const client = { ...snapshot.data(), id: snapshot.id } as Client;
+  return client.orgId === orgId ? client : null;
+}
+
+export async function addClient(
+  orgId: string = "n4u3mv4HPuAhPxs3Dot7",
+  client: NewClient,
+): Promise<Client> {
   const normalizedName = client.clientName.trim().toLowerCase();
   const existingClients = await getClients(orgId);
   const alreadyExists = existingClients.some(
@@ -59,7 +100,7 @@ export async function createClient(orgId: string, client: NewClient): Promise<Cl
     orgId,
     isDeleted: false,
     createdAt: new Date().toISOString(),
-    pendingInvoiceCount: 0
+    pendingInvoiceCount: 0,
   };
 
   await setDoc(reference, createdClient);

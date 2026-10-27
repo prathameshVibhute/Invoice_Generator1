@@ -12,6 +12,8 @@ interface InvoiceFormClientDetailsProps {
   invoiceNumber: string;
   issueDate: string;
   dueDate: string;
+  onIssueDateChange: (value: string) => void;
+  onDueDateChange: (value: string) => void;
   onClientChange: (client: Client | null) => void;
   gst: boolean;
   onGstChange: (gst: boolean) => void;
@@ -25,6 +27,8 @@ export function InvoiceFormClientDetails({
   invoiceNumber,
   issueDate,
   dueDate,
+  onIssueDateChange,
+  onDueDateChange,
   onClientChange,
   gst,
   onGstChange,
@@ -118,7 +122,8 @@ export function InvoiceFormClientDetails({
               className="rounded-xl border border-slate-200 bg-white p-3 font-normal"
               type="date"
               value={issueDate}
-              disabled
+              onChange={(event) => onIssueDateChange(event.target.value)}
+              disabled={!invoice}
               required
             />
           </label>
@@ -130,7 +135,8 @@ export function InvoiceFormClientDetails({
                 type="date"
                 value={dueDate}
                 min={issueDate}
-                disabled
+                onChange={(event) => onDueDateChange(event.target.value)}
+                disabled={!invoice}
                 required
               />
             </label>

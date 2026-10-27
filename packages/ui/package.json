@@ -14,7 +14,8 @@
     "./pagination": "./components/pagination/index.tsx",
     "./empty-state-page": "./components/empty-state-page/index.tsx",
     "./stepper": "./components/stepper/index.tsx",
-    "./search-select": "./components/search-select.tsx"
+    "./search-select": "./components/search-select.tsx",
+    "./tabs": "./components/tabs/index.tsx"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",

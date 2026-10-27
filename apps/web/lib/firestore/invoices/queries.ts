@@ -84,3 +84,63 @@ export async function createInvoice(orgId: string, invoice: NewInvoice): Promise
 
   return createdInvoice;
 }
+
+export async function updateInvoice(
+  orgId: string,
+  invoiceId: string,
+  updates: InvoicePayload,
+): Promise<void> {
+  if (updates.orgId !== orgId) {
+    throw new Error("Invoice organization does not match the requested organization.");
+  }
+
+  const invoiceReference = doc(db, "invoice_generation_invoices", invoiceId);
+  const clientReference = doc(db, "invoice_generation_clients", updates.clientId);
+
+  await runTransaction(db, async (transaction) => {
+    const [invoiceSnapshot, clientSnapshot] = await Promise.all([
+      transaction.get(invoiceReference),
+      transaction.get(clientReference),
+    ]);
+
+    if (!invoiceSnapshot.exists()) {
+      throw new Error(`Invoice not found: ${invoiceId}`);
+    }
+
+    const existingInvoice = invoiceSnapshot.data();
+    if (existingInvoice.orgId !== orgId || existingInvoice.isDeleted) {
+      throw new Error(`Invoice does not belong to organization: ${invoiceId}`);
+    }
+
+    if (!clientSnapshot.exists()) {
+      throw new Error(`Client not found: ${updates.clientId}`);
+    }
+    const client = clientSnapshot.data();
+    if (client.orgId !== orgId || client.isDeleted) {
+      throw new Error(`Client does not belong to organization: ${updates.clientId}`);
+    }
+
+    const clientChanged = existingInvoice.clientId !== updates.clientId;
+    const shouldUpdatePendingCounts = clientChanged && existingInvoice.status !== "paid";
+    const previousClientReference = shouldUpdatePendingCounts
+      ? doc(db, "invoice_generation_clients", existingInvoice.clientId)
+      : null;
+    const previousClientSnapshot = previousClientReference
+      ? await transaction.get(previousClientReference)
+      : null;
+
+    if (previousClientReference && !previousClientSnapshot?.exists()) {
+      throw new Error(`Previous invoice client not found: ${existingInvoice.clientId}`);
+    }
+
+    transaction.update(invoiceReference, {
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    });
+
+    if (previousClientReference && previousClientSnapshot?.exists()) {
+      transaction.update(previousClientReference, { pendingInvoiceCount: increment(-1) });
+      transaction.update(clientReference, { pendingInvoiceCount: increment(1) });
+    }
+  });
+}

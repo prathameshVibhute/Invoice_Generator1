@@ -215,10 +215,4 @@ export const invoices: Invoice[] = [
 ];
 export const getClient = (id: string): Client =>
   clients.find((client) => client.id === id) ?? clients[0]!;
-export const money = (amount: number): string =>
-  new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount);
+export { formatMoney as money } from "./utils/formatMoney";

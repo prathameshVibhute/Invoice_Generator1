@@ -113,6 +113,11 @@ export function InvoiceFormReview({
                 <div className="flex items-start justify-between gap-3 py-5 px-3" key={item.id}>
                   <div>
                     <p className="m-0 font-medium text-slate-900">{item.itemName}</p>
+                    {item.description?.trim() ? (
+                      <p className="mb-0 mt-1 whitespace-pre-wrap text-sm text-slate-600">
+                        {item.description}
+                      </p>
+                    ) : null}
                     <p className="mb-0 mt-2 text-slate-500">
                       {item.quantity} × {money(item.rate)}
                     </p>
