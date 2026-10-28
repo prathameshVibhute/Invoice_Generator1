@@ -6,7 +6,6 @@ import { Dropdown } from "@invoice-generator/ui/dropdown";
 import { Button } from "@invoice-generator/ui/button";
 import { Client, clientFormSchema, ClientFormValues, STATE } from "@invoice-generator/types";
 import { FormEvent, useState } from "react";
-import { clients } from "../../data";
 
 type NewClient = Omit<Client, "id" | "orgId" | "createdAt" | "isDeleted">;
 
@@ -19,25 +18,31 @@ type ClientFormErrors = Omit<
 
 interface ClientFormContainerProps {
   id?: string;
-  addClientAction: (client: NewClient) => Promise<Client>;
+  client?: Client;
+  addClientAction?: (client: NewClient) => Promise<Client>;
+  updateClientAction?: (clientId: string, updates: Partial<NewClient>) => Promise<void>;
 }
 
-export function ClientFormContainer({ id, addClientAction }: ClientFormContainerProps) {
+export function ClientFormContainer({
+  id,
+  client: existingClient,
+  addClientAction,
+  updateClientAction,
+}: ClientFormContainerProps) {
   const t = useTranslations("clientForm");
   const router = useRouter();
-  const client = clients.find((item) => item.id === id);
   const [values, setValues] = useState<ClientFormValues>({
-    clientName: client?.clientName ?? "",
+    clientName: existingClient?.clientName ?? "",
     contactPersonDetails: {
-      firstName: "",
-      lastName: "",
+      firstName: existingClient?.contactPersonDetails.firstName ?? "",
+      lastName: existingClient?.contactPersonDetails.lastName ?? "",
     },
-    gstNumber: client?.gstNumber ?? "",
-    address: client?.address ?? "",
-    state: client?.state ?? STATE[25]?.stateName ?? "",
-    country: client?.country ?? "India",
-    contactDetails: client?.contactDetails ?? "",
-    email: client?.email ?? "",
+    gstNumber: existingClient?.gstNumber ?? "",
+    address: existingClient?.address ?? "",
+    state: existingClient?.state ?? STATE[25]?.stateName ?? "",
+    country: existingClient?.country ?? "India",
+    contactDetails: existingClient?.contactDetails ?? "",
+    email: existingClient?.email ?? "",
   });
   const [errors, setErrors] = useState<ClientFormErrors>({});
   const stateOptions = STATE.map((state) => {
@@ -89,7 +94,13 @@ export function ClientFormContainer({ id, addClientAction }: ClientFormContainer
       return;
     }
     setErrors({});
-    await addClientAction({ ...result.data, pendingInvoiceCount: 0 });
+    if (id && updateClientAction) {
+      await updateClientAction(id, result.data);
+    } else if (addClientAction) {
+      await addClientAction({ ...result.data, pendingInvoiceCount: 0 });
+    } else {
+      throw new Error("No client save action configured.");
+    }
     router.push("/clients");
   }
 
@@ -97,14 +108,14 @@ export function ClientFormContainer({ id, addClientAction }: ClientFormContainer
     <form onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <div className="flex w-full flex-col gap-1.5 p-2">
-          <label>
+          <label className="text-sm font-semibold">
             {t("organizationName")}{" "}
             <span aria-hidden="true" className="text-red-600">
               *
             </span>
           </label>
           <input
-            className="rounded-xl border border-slate-200 p-3"
+            className="rounded-xl border border-slate-200 p-3 text-sm font-normal"
             value={values.clientName}
             onChange={(event) => updateField("clientName", event.target.value)}
             placeholder={t("organizationNamePlaceholder")}
@@ -112,7 +123,7 @@ export function ClientFormContainer({ id, addClientAction }: ClientFormContainer
           {errors.clientName && <span className="text-red-600">{errors.clientName}</span>}
         </div>
         <div className="flex w-full flex-col gap-1.5 p-2">
-          <label>
+          <label className="text-sm font-semibold">
             {t("contactPersonDetails")}{" "}
             <span aria-hidden="true" className="text-red-600">
               *
@@ -120,7 +131,7 @@ export function ClientFormContainer({ id, addClientAction }: ClientFormContainer
           </label>
           <div className="flex w-full flex-row gap-2">
             <input
-              className="w-full rounded-xl border border-slate-200 p-3"
+              className="w-full rounded-xl border border-slate-200 p-3 text-sm font-normal"
               value={values.contactPersonDetails.firstName}
               onChange={(event) =>
                 updateField("contactPersonDetails", {
@@ -131,7 +142,7 @@ export function ClientFormContainer({ id, addClientAction }: ClientFormContainer
               placeholder={t("firstNamePlaceholder")}
             />
             <input
-              className="w-full rounded-xl border border-slate-200 p-3"
+              className="w-full rounded-xl border border-slate-200 p-3 text-sm font-normal"
               value={values.contactPersonDetails.lastName}
               onChange={(event) =>
                 updateField("contactPersonDetails", {
@@ -149,9 +160,9 @@ export function ClientFormContainer({ id, addClientAction }: ClientFormContainer
           )}
         </div>
         <div className="flex w-full flex-col gap-1.5 p-2">
-          <label>{t("gstNumber")}</label>
+          <label className="text-sm font-semibold">{t("gstNumber")}</label>
           <input
-            className="rounded-xl border border-slate-200 p-3"
+            className="rounded-xl border border-slate-200 p-3 text-sm font-normal"
             value={values.gstNumber}
             onChange={(event) => updateField("gstNumber", event.target.value)}
             placeholder={t("gstNumberPlaceholder")}
@@ -159,9 +170,9 @@ export function ClientFormContainer({ id, addClientAction }: ClientFormContainer
           {errors.gstNumber && <span className="text-red-600">{errors.gstNumber}</span>}
         </div>
         <div className="flex w-full flex-col gap-1.5 p-2">
-          <label>{t("address")}</label>
+          <label className="text-sm font-semibold">{t("address")}</label>
           <input
-            className="rounded-xl border border-slate-200 p-3"
+            className="rounded-xl border border-slate-200 p-3 text-sm font-normal"
             value={values.address}
             onChange={(event) => updateField("address", event.target.value)}
             placeholder={t("addressPlaceholder")}
@@ -169,7 +180,7 @@ export function ClientFormContainer({ id, addClientAction }: ClientFormContainer
           {errors.address && <span className="text-red-600">{errors.address}</span>}
         </div>
         <div className="flex w-full flex-col gap-1.5 p-2">
-          <label>
+          <label className="text-sm font-semibold">
             {t("state")}{" "}
             <span aria-hidden="true" className="text-red-600">
               *
@@ -184,28 +195,28 @@ export function ClientFormContainer({ id, addClientAction }: ClientFormContainer
           {errors.state && <span className="text-red-600">{errors.state}</span>}
         </div>
         <div className="flex w-full flex-col gap-1.5 p-2">
-          <label>{t("country")}</label>
+          <label className="text-sm font-semibold">{t("country")}</label>
           <input
             disabled={true}
-            className="rounded-xl border border-slate-200 p-3 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60"
+            className="rounded-xl border border-slate-200 p-3 text-sm font-normal disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60"
             value={values.country}
             onChange={(event) => updateField("country", event.target.value)}
           />
           {errors.country && <span className="text-red-600">{errors.country}</span>}
         </div>
         <div className="flex w-full flex-col gap-1.5 p-2">
-          <label>{t("contactDetails")}</label>
+          <label className="text-sm font-semibold">{t("contactDetails")}</label>
           <input
-            className="rounded-xl border border-slate-200 p-3"
+            className="rounded-xl border border-slate-200 p-3 text-sm font-normal"
             value={values.contactDetails}
             onChange={(event) => updateField("contactDetails", event.target.value)}
           />
           {errors.contactDetails && <span className="text-red-600">{errors.contactDetails}</span>}
         </div>
         <div className="flex w-full flex-col gap-1.5 p-2">
-          <label>{t("email")}</label>
+          <label className="text-sm font-semibold">{t("email")}</label>
           <input
-            className="rounded-xl border border-slate-200 p-3"
+            className="rounded-xl border border-slate-200 p-3 text-sm font-normal"
             type="email"
             value={values.email}
             onChange={(event) => updateField("email", event.target.value)}

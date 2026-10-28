@@ -2,7 +2,7 @@
 
 import type { Client } from "@invoice-generator/types";
 import { ORGANIZATION_ID } from "../../constants";
-import { addClient, getClientById, getClients } from "./queries";
+import { addClient, getClientById, getClients, updateClient } from "./queries";
 
 type NewClient = Omit<Client, "id" | "orgId" | "createdAt" | "isDeleted">;
 type ClientUpdates = Partial<Omit<Client, "id" | "orgId" | "createdAt" | "isDeleted">>;
@@ -17,4 +17,8 @@ export async function getClientsAction(searchValue?: string): Promise<Client[]> 
 
 export async function getClientByIdAction(clientId: string): Promise<Client | null> {
   return getClientById(ORGANIZATION_ID, clientId);
+}
+
+export async function updateClientAction(clientId: string, updates: ClientUpdates): Promise<void> {
+  return updateClient(ORGANIZATION_ID, clientId, updates);
 }

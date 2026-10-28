@@ -11,13 +11,13 @@ interface ClientFormHeader {
 export function ClientFormHeader({ formType }: ClientFormHeader) {
   const t = useTranslations("clientForm");
   return (
-    <header className="mb-6 flex items-center justify-between gap-3">
+    <header className="relative mb-6 h-10 flex items-center justify-center gap-3">
       <Button
         routeUrl="/clients"
         icon={IconArrowLeft}
-        className="flex items-center rounded-xl border border-slate-200 bg-white p-3"
+        className="absolute left-0 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5"
       />
-      <h1 className="text-2xl font-bold">{formType === FormType.Edit ? t("edit") : t("new")}</h1>
+      <h1 className="text-center text-xl font-semibold">{formType === FormType.Edit ? t("edit") : t("new")}</h1>
     </header>
   );
 }

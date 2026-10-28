@@ -116,6 +116,11 @@ export function InvoiceFormItemDetails({
     setEditingItemId(null);
   }
 
+  function closeEditor() {
+    setDraft(toDraft(undefined, gst));
+    setEditingItemId(null);
+  }
+
   function renderEditor() {
     return (
       <div className="p-0">
@@ -189,7 +194,14 @@ export function InvoiceFormItemDetails({
             />
           </label>
         </div>
-        <div className="flex w-full">
+        <div className="flex w-full gap-3">
+          <Button
+            className="w-full items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-3 font-regular text-slate-600"
+            type="button"
+            onClick={closeEditor}
+          >
+            Close
+          </Button>
           <Button
             className="w-full items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-3 font-regular text-white disabled:cursor-not-allowed disabled:opacity-45"
             type="button"

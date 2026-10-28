@@ -62,7 +62,7 @@ export function Dropdown({
         aria-expanded={isOpen}
         disabled={disabled}
         onClick={() => setIsOpen((open) => !open)}
-        className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-3 text-left disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60"
+        className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-3 text-left text-sm font-normal disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-60"
       >
         <span
           className={`min-w-0 flex-1 break-words ${selectedOption ? "text-slate-900" : "text-slate-500"}`}
@@ -88,7 +88,7 @@ export function Dropdown({
                 aria-selected={isSelected}
                 key={option.value}
                 onClick={() => handleSelect(option)}
-                className="flex w-full items-center justify-between px-3 py-3 text-left hover:bg-slate-50"
+                className="flex w-full items-center justify-between px-3 py-3 text-left text-sm font-normal hover:bg-slate-50"
               >
                 <span className="min-w-0 flex-1 break-words">{option.label}</span>
                 {isSelected && <IconCheck className="h-5 w-5 text-blue-600" aria-hidden="true" />}

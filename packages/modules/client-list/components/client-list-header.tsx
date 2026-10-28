@@ -3,13 +3,13 @@
 import { IconPlus, IconSettings } from "@tabler/icons-react";
 import { Button } from "@invoice-generator/ui/button";
 
-export function ClientListHeader() {
+export function ClientListHeader({ organizationName }: { organizationName: string }) {
   return (
     <>
       <header className="mb-6 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Clients</h1>
-          <div className="text-xs text-slate-500">Acme Studio</div>
+          <div className="text-xs text-slate-500">{organizationName}</div>
         </div>
         <div className="flex gap-2">
           <Button

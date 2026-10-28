@@ -26,7 +26,7 @@ export function InvoiceListScreen({
         <div>
           <h1 className="text-2xl font-bold">Invoices</h1>
           <div className="text-xs text-slate-500">
-            {organizationName} · <Link href="/organization">Settings</Link>
+            {organizationName}
           </div>
         </div>
         <div className="flex gap-2.5">

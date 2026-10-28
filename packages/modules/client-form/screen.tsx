@@ -9,20 +9,28 @@ type NewClient = Omit<Client, "id" | "orgId" | "createdAt" | "isDeleted">;
 
 interface ClientFormScreen {
   id?: string;
-  addClientAction: (client: NewClient) => Promise<Client>;
+  client?: Client;
+  addClientAction?: (client: NewClient) => Promise<Client>;
+  updateClientAction?: (clientId: string, updates: Partial<NewClient>) => Promise<void>;
 }
 
-export function ClientFormScreen({ id, addClientAction }: ClientFormScreen) {
-
+export function ClientFormScreen({
+  id,
+  client,
+  addClientAction,
+  updateClientAction,
+}: ClientFormScreen) {
   return (
     <>
       {/* Header section */}
-      <ClientFormHeader formType={id ? FormType.Edit : FormType.New } />
+      <ClientFormHeader formType={id ? FormType.Edit : FormType.New} />
       {/* Form Container */}
       <ClientFormContainer
         {...(id !== undefined ? { id } : {})}
-        addClientAction={addClientAction}
+        {...(client !== undefined ? { client } : {})}
+        {...(addClientAction !== undefined ? { addClientAction } : {})}
+        {...(updateClientAction !== undefined ? { updateClientAction } : {})}
       />
-    </>      
+    </>
   );
 }
